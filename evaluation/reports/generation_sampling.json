@@ -1,0 +1,149 @@
+{
+  "created_at": "2026-08-27T14:29:18.687602+00:00",
+  "model": {
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "requested_revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8",
+    "resolved_revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8",
+    "device": "mps",
+    "dtype": "float16",
+    "load_seconds": 2.518162,
+    "parameter_count": 494032768,
+    "parameter_bytes": 988065536
+  },
+  "environment": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "torch": "2.13.0",
+    "transformers": "5.16.1"
+  },
+  "prompt": "Name an internal AI knowledge engine. Return exactly three lines in the format 'Name — explanation', with each explanation limited to eight words.",
+  "system_prompt": "You are a concise product-naming assistant. Follow the requested format exactly and add no introduction.",
+  "results": [
+    {
+      "profile": "greedy",
+      "text": "Assistant — A tool that provides structured information and insights from internal sources, enhancing decision-making and knowledge management.",
+      "input_tokens": 59,
+      "output_tokens": 22,
+      "generation_seconds": 1.285328,
+      "tokens_per_second": 17.116254,
+      "options": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.9,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": false
+      },
+      "format_compliant": false
+    },
+    {
+      "profile": "temperature_0.1",
+      "text": "Assistant — A tool that provides structured, contextually appropriate information to users, often NodeList, providing insights and answers to questions.",
+      "input_tokens": 59,
+      "output_tokens": 26,
+      "generation_seconds": 1.05637,
+      "tokens_per_second": 24.612588,
+      "options": {
+        "temperature": 0.1,
+        "top_k": 50,
+        "top_p": 0.9,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": false
+    },
+    {
+      "profile": "temperature_0.7",
+      "text": "TensorFlow — It's an open-source AI framework that allows developers to build, NodeList — A tool for managing and analyzing large datasets, including text, image, and video, for machine learning and natural language processing.",
+      "input_tokens": 59,
+      "output_tokens": 44,
+      "generation_seconds": 1.74852,
+      "tokens_per_second": 25.164139,
+      "options": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.9,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": false
+    },
+    {
+      "profile": "temperature_0.7_repeat",
+      "text": "TensorFlow — It's an open-source AI framework that allows developers to build, NodeList — A tool for managing and analyzing large datasets, including text, image, and video, for machine learning and natural language processing.",
+      "input_tokens": 59,
+      "output_tokens": 44,
+      "generation_seconds": 1.76783,
+      "tokens_per_second": 24.889269,
+      "options": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.9,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": false
+    },
+    {
+      "profile": "temperature_1.2",
+      "text": "Ezviz — accessible knowledge application, user-guided information retrieval platform.",
+      "input_tokens": 59,
+      "output_tokens": 16,
+      "generation_seconds": 0.641668,
+      "tokens_per_second": 24.935021,
+      "options": {
+        "temperature": 1.2,
+        "top_k": 50,
+        "top_p": 0.9,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": false
+    },
+    {
+      "profile": "top_p_0.5",
+      "text": "TensorFlow — a powerful, open-source AI framework.  \nMicrosoft Azure Cognitive Services NodeList — a comprehensive suite of AI services.  \nIBM Watson — a deep learning platform for enterprise AI.",
+      "input_tokens": 59,
+      "output_tokens": 38,
+      "generation_seconds": 1.496517,
+      "tokens_per_second": 25.392294,
+      "options": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.5,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": true
+    },
+    {
+      "profile": "top_p_0.95",
+      "text": "TensorFlow — It's an open-source AI framework that allows developers to build, NodeList — A tool for managing and analyzing large datasets, including entities like nodes in a graph, for machine learning and data science tasks.",
+      "input_tokens": 59,
+      "output_tokens": 44,
+      "generation_seconds": 1.749475,
+      "tokens_per_second": 25.150408,
+      "options": {
+        "temperature": 0.7,
+        "top_k": 50,
+        "top_p": 0.95,
+        "max_new_tokens": 56,
+        "repetition_penalty": 1.0,
+        "seed": 42,
+        "do_sample": true
+      },
+      "format_compliant": false
+    }
+  ]
+}

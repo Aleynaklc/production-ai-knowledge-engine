@@ -13,3 +13,15 @@ def test_settings_use_prefixed_environment_variables(monkeypatch: MonkeyPatch) -
     settings = Settings()
 
     assert settings.environment == "test"
+
+
+def test_model_settings_are_validated(monkeypatch: MonkeyPatch) -> None:
+    """Local inference settings should be configurable through the same prefix."""
+
+    monkeypatch.setenv("PAKE_DEVICE", "cpu")
+    monkeypatch.setenv("PAKE_MAX_NEW_TOKENS", "64")
+
+    settings = Settings()
+
+    assert settings.device == "cpu"
+    assert settings.max_new_tokens == 64
