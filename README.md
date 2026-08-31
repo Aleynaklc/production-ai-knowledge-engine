@@ -6,8 +6,8 @@ measurable and inspectable.
 
 The project is being developed in tested stages. The current foundation includes
 transparent attention and tokenization experiments, configurable local Hugging Face
-inference, and a measured dense/sparse/hybrid retrieval system. Later stages add
-grounded generation and an interactive frontend.
+inference, a measured dense/sparse/hybrid retrieval system, and grounded local answer
+generation. Later stages add the interactive frontend and production operations.
 
 ## Current capabilities
 
@@ -28,6 +28,9 @@ grounded generation and an interactive frontend.
 - Local Qdrant cosine retrieval with 384-dimensional sentence embeddings
 - Okapi BM25, Reciprocal Rank Fusion, and cross-encoder reranking
 - A versioned 30-query relevance set with Recall, Precision, MRR, NDCG, and latency
+- Token-budgeted grounded generation with source citations and safe abstention
+- Citation validation that suppresses invented sources and uncited factual claims
+- Lazy local RAG API at `POST /rag/answer`
 
 ## Prerequisites
 
@@ -137,6 +140,24 @@ See the [retrieval architecture](docs/retrieval-system.md), the generated
 [chunking comparison](docs/chunking-comparison.md), and the measured
 [retrieval report](docs/retrieval-evaluation.md).
 
+## Grounded RAG
+
+Ask a source-grounded question with the pinned local language model:
+
+```bash
+uv run python -m scripts.rag "How long do access tokens last?"
+```
+
+Run the 20-question answer, citation, grounding, and abstention benchmark:
+
+```bash
+uv run python -m scripts.evaluate_rag
+```
+
+The same pipeline is available at `POST /rag/answer`. Models are loaded lazily on the
+first RAG request. See the [Grounded RAG design](docs/grounded-rag.md) and generated
+[Grounded RAG evaluation](docs/grounded-rag-evaluation.md).
+
 ## Configuration
 
 Runtime settings are read from environment variables prefixed with `PAKE_`.
@@ -159,6 +180,13 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_RETRIEVAL_DEVICE` | `auto` | Retrieval model accelerator |
 | `PAKE_RETRIEVAL_TOP_K` | `5` | Final retrieval depth |
 | `PAKE_RETRIEVAL_CANDIDATE_K` | `20` | Hybrid/reranker candidate depth |
+| `PAKE_RAG_TOP_K` | `5` | Retrieved passages sent to context assembly |
+| `PAKE_RAG_MAX_SOURCES` | `3` | Maximum source blocks in one answer |
+| `PAKE_RAG_CONTEXT_TOKENS` | `650` | Source context token budget |
+| `PAKE_RAG_MAX_NEW_TOKENS` | `80` | Grounded answer generation limit |
+| `PAKE_RAG_STRICT_GROUNDING` | `true` | Suppress answers that fail citation validation |
+| `PAKE_RAG_MIN_RETRIEVAL_SCORE` | `0.8` | Cross-encoder confidence floor for generation |
+| `PAKE_RAG_EXTRACTIVE_FALLBACK_SCORE` | `1.0` | Minimum score for cited extractive fallback |
 
 ## Repository structure
 
@@ -171,6 +199,7 @@ backend/
     ingestion/      # Loaders, cleaning, token chunking, and persistence
     main.py         # FastAPI application and health endpoint
     llm/            # Model loading, prompt construction, and generation
+    rag/            # Context budgeting, grounded prompts, citations, and answer service
     retrieval/      # Qdrant, BM25, RRF, hybrid search, and reranking
 data/raw/           # Versioned NovaStack demonstration knowledge base
 data/evaluation/    # Human-reviewable and resolved retrieval relevance labels

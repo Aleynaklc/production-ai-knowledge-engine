@@ -34,6 +34,13 @@ class Settings(BaseSettings):
     qdrant_collection: str = "novastack_chunks"
     retrieval_top_k: int = Field(default=5, ge=1, le=100)
     retrieval_candidate_k: int = Field(default=20, ge=2, le=200)
+    rag_top_k: int = Field(default=5, ge=1, le=20)
+    rag_max_sources: int = Field(default=3, ge=1, le=20)
+    rag_context_tokens: int = Field(default=650, ge=128, le=16_384)
+    rag_max_new_tokens: int = Field(default=80, ge=16, le=2_048)
+    rag_strict_grounding: bool = True
+    rag_min_retrieval_score: float = 0.8
+    rag_extractive_fallback_score: float = 1.0
 
     model_config = SettingsConfigDict(
         env_file=".env",

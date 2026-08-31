@@ -1,0 +1,20 @@
+{"id":"r001","question":"How long does a NovaStack access token remain valid?","answerable":true,"relevant_document_ids":["novastack_authentication"],"required_answer_terms":["15 minutes"]}
+{"id":"r002","question":"What security action follows reuse of a refresh token?","answerable":true,"relevant_document_ids":["novastack_authentication"],"required_answer_terms":["token family","revok"]}
+{"id":"r003","question":"Which component makes the final resource authorization decision?","answerable":true,"relevant_document_ids":["novastack_authentication"],"required_answer_terms":["destination service"]}
+{"id":"r004","question":"What is the default API request limit for one tenant?","answerable":true,"relevant_document_ids":["novastack_api_gateway"],"required_answer_terms":["600","minute"]}
+{"id":"r005","question":"Does the gateway automatically retry failed POST requests with idempotency keys?","answerable":true,"relevant_document_ids":["novastack_api_gateway"],"required_answer_terms":["never automatically retries"]}
+{"id":"r006","question":"How long is a payment idempotency key retained?","answerable":true,"relevant_document_ids":["novastack_payments"],"required_answer_terms":["24 hours"]}
+{"id":"r007","question":"Which algorithm signs payment webhooks?","answerable":true,"relevant_document_ids":["novastack_payments"],"required_answer_terms":["hmac-sha256"]}
+{"id":"r008","question":"What traffic percentage and duration are used for each regional deployment canary?","answerable":true,"relevant_document_ids":["novastack_deployment"],"required_answer_terms":["five percent","ten minutes"]}
+{"id":"r009","question":"What p95 latency increase triggers an automatic rollback?","answerable":true,"relevant_document_ids":["novastack_deployment"],"required_answer_terms":["40 percent"]}
+{"id":"r010","question":"Which region and time window were affected by incident 2026-001?","answerable":true,"relevant_document_ids":["novastack_incident_2026_001"],"required_answer_terms":["eu-west","09:12","09:31"]}
+{"id":"r011","question":"What caused the authentication errors in incident 2026-001?","answerable":true,"relevant_document_ids":["novastack_incident_2026_001"],"required_answer_terms":["jwks","one hour"]}
+{"id":"r012","question":"Which schema migration pattern allows old and new application versions to coexist?","answerable":true,"relevant_document_ids":["novastack_database_migration"],"required_answer_terms":["expand-and-contract"]}
+{"id":"r013","question":"How long are daily and monthly database backups kept?","answerable":true,"relevant_document_ids":["novastack_database_migration"],"required_answer_terms":["35 days","12 months"]}
+{"id":"r014","question":"Compare retention for application logs and security audit logs.","answerable":true,"relevant_document_ids":["novastack_observability"],"required_answer_terms":["30 days","365 days"]}
+{"id":"r015","question":"How quickly must an internet-facing critical vulnerability be fixed?","answerable":true,"relevant_document_ids":["novastack_security_policy"],"required_answer_terms":["24 hours"]}
+{"id":"r016","question":"What is the initial response target for a severity-one support ticket?","answerable":true,"relevant_document_ids":["novastack_support_faq"],"required_answer_terms":["30 minutes"]}
+{"id":"r017","question":"Which Kubernetes version runs in NovaStack production?","answerable":false,"relevant_document_ids":[],"required_answer_terms":[]}
+{"id":"r018","question":"Who is NovaStack's current chief executive officer?","answerable":false,"relevant_document_ids":[],"required_answer_terms":[]}
+{"id":"r019","question":"Where is NovaStack's Istanbul office located?","answerable":false,"relevant_document_ids":[],"required_answer_terms":[]}
+{"id":"r020","question":"What telephone number should customers call for NovaStack support?","answerable":false,"relevant_document_ids":[],"required_answer_terms":[]}
