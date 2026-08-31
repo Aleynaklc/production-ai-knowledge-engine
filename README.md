@@ -5,10 +5,9 @@ grounding, context construction, inference performance, and engineering trade-of
 measurable and inspectable.
 
 The project is being developed in tested stages. The current foundation includes
-transparent attention and tokenization experiments plus configurable local Hugging
-Face inference and sampling benchmarks. Later stages add document ingestion, dense
-and sparse retrieval, reranking, grounded generation, evaluation, and an interactive
-frontend.
+transparent attention and tokenization experiments, configurable local Hugging Face
+inference, and a measured dense/sparse/hybrid retrieval system. Later stages add
+grounded generation and an interactive frontend.
 
 ## Current capabilities
 
@@ -25,6 +24,10 @@ frontend.
   `AutoModelForCausalLM`
 - Generation controls for temperature, top-k, top-p, output length, repetition
   penalty, seed, and greedy decoding
+- Deterministic Markdown/text ingestion with fixed and recursive token chunking
+- Local Qdrant cosine retrieval with 384-dimensional sentence embeddings
+- Okapi BM25, Reciprocal Rank Fusion, and cross-encoder reranking
+- A versioned 30-query relevance set with Recall, Precision, MRR, NDCG, and latency
 
 ## Prerequisites
 
@@ -108,6 +111,32 @@ See [the model decision](docs/model-choice.md), the measured
 [local inference evidence](docs/local-inference.md), and the generated
 [sampling report](docs/generation-sampling.md) for the measured trade-offs.
 
+## Retrieval pipeline
+
+Create both chunking variants and their resolved relevance labels:
+
+```bash
+uv run python -m scripts.ingest data/raw
+```
+
+Build local Qdrant indexes and run the complete retrieval benchmark:
+
+```bash
+uv run python -m scripts.evaluate_retrieval
+```
+
+Search interactively with `dense`, `bm25`, `hybrid`, or `reranked`:
+
+```bash
+uv run python -m scripts.search \
+  "What caused the authentication incident?" \
+  --method reranked
+```
+
+See the [retrieval architecture](docs/retrieval-system.md), the generated
+[chunking comparison](docs/chunking-comparison.md), and the measured
+[retrieval report](docs/retrieval-evaluation.md).
+
 ## Configuration
 
 Runtime settings are read from environment variables prefixed with `PAKE_`.
@@ -123,6 +152,13 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_MODEL_REVISION` | pinned commit | Immutable model revision |
 | `PAKE_DEVICE` | `auto` | `auto`, `cpu`, `mps`, or `cuda` |
 | `PAKE_MAX_NEW_TOKENS` | `128` | Default generation limit |
+| `PAKE_CHUNK_SIZE_TOKENS` | `160` | Maximum chunk token count |
+| `PAKE_CHUNK_OVERLAP_TOKENS` | `30` | Token overlap between chunks |
+| `PAKE_EMBEDDING_MODEL_NAME` | `sentence-transformers/all-MiniLM-L6-v2` | Dense embedding model |
+| `PAKE_RERANKER_MODEL_NAME` | `cross-encoder/ms-marco-MiniLM-L6-v2` | Candidate reranker |
+| `PAKE_RETRIEVAL_DEVICE` | `auto` | Retrieval model accelerator |
+| `PAKE_RETRIEVAL_TOP_K` | `5` | Final retrieval depth |
+| `PAKE_RETRIEVAL_CANDIDATE_K` | `20` | Hybrid/reranker candidate depth |
 
 ## Repository structure
 
@@ -130,8 +166,14 @@ Git; only placeholder values belong in `.env.example`.
 backend/
   app/
     config.py       # Typed environment configuration
+    embeddings/     # Sentence embedding boundary and implementation
+    evaluation/     # Versioned query labels and ranking metrics
+    ingestion/      # Loaders, cleaning, token chunking, and persistence
     main.py         # FastAPI application and health endpoint
     llm/            # Model loading, prompt construction, and generation
+    retrieval/      # Qdrant, BM25, RRF, hybrid search, and reranking
+data/raw/           # Versioned NovaStack demonstration knowledge base
+data/evaluation/    # Human-reviewable and resolved retrieval relevance labels
 scripts/            # Reproducible CLI and experiment runners
 docs/               # Decisions and measured engineering reports
 evaluation/reports/ # Machine-readable experiment evidence
@@ -140,5 +182,5 @@ notebooks/          # Executable AI/LLM learning experiments
 .github/workflows/  # Continuous integration
 ```
 
-Additional directories will be introduced only when their implementation stage
-begins, keeping the repository runnable and avoiding empty architecture.
+Generated chunk files and the local Qdrant database are ignored; rerunning ingestion and
+evaluation recreates them from versioned sources.

@@ -1,0 +1,2616 @@
+{
+  "schema_version": 1,
+  "corpus": {
+    "documents": 9,
+    "fixed_chunks": 18,
+    "recursive_chunks": 18,
+    "queries": 30
+  },
+  "models": {
+    "embedding": {
+      "name": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "dimension": 384
+    },
+    "reranker": {
+      "name": "cross-encoder/ms-marco-MiniLM-L6-v2",
+      "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a"
+    }
+  },
+  "configuration": {
+    "top_k": 5,
+    "candidate_k": 20,
+    "qdrant_distance": "cosine",
+    "fusion": "reciprocal_rank_fusion",
+    "rrf_rank_constant": 60
+  },
+  "evaluations": {
+    "dense_fixed": {
+      "retriever": "dense",
+      "metrics": {
+        "query_count": 30,
+        "answerable_query_count": 29,
+        "unanswerable_query_count": 1,
+        "recall_at_k": {
+          "1": 0.551724,
+          "3": 0.965517,
+          "5": 1.0
+        },
+        "precision_at_k": {
+          "1": 0.551724,
+          "3": 0.321839,
+          "5": 0.2
+        },
+        "mrr_at_k": {
+          "1": 0.551724,
+          "3": 0.747126,
+          "5": 0.755747
+        },
+        "ndcg_at_k": {
+          "1": 0.551724,
+          "3": 0.795352,
+          "5": 0.810203
+        },
+        "mean_latency_ms": 13.793871,
+        "p95_latency_ms": 22.064862
+      },
+      "per_query": [
+        {
+          "query_id": "q001",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "a781f61a-307b-5330-8d65-bfe392b16781"
+          ],
+          "retrieved_chunk_ids": [
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 18.285125
+        },
+        {
+          "query_id": "q002",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "a781f61a-307b-5330-8d65-bfe392b16781"
+          ],
+          "retrieved_chunk_ids": [
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 19.889542
+        },
+        {
+          "query_id": "q003",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "87613947-f1ff-5ae7-9610-9835fe112390"
+          ],
+          "retrieved_chunk_ids": [
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 12.544416
+        },
+        {
+          "query_id": "q004",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "a781f61a-307b-5330-8d65-bfe392b16781"
+          ],
+          "retrieved_chunk_ids": [
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 10.053208
+        },
+        {
+          "query_id": "q005",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "retrieved_chunk_ids": [
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.535208
+        },
+        {
+          "query_id": "q006",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "retrieved_chunk_ids": [
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 22.9775
+        },
+        {
+          "query_id": "q007",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43"
+          ],
+          "retrieved_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483"
+          ],
+          "first_relevant_rank": 3,
+          "latency_ms": 19.75925
+        },
+        {
+          "query_id": "q008",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "retrieved_chunk_ids": [
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 10.599167
+        },
+        {
+          "query_id": "q009",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef"
+          ],
+          "retrieved_chunk_ids": [
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "a781f61a-307b-5330-8d65-bfe392b16781"
+          ],
+          "first_relevant_rank": 3,
+          "latency_ms": 11.527292
+        },
+        {
+          "query_id": "q010",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef"
+          ],
+          "retrieved_chunk_ids": [
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 20.949416
+        },
+        {
+          "query_id": "q011",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483"
+          ],
+          "retrieved_chunk_ids": [
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 24.259542
+        },
+        {
+          "query_id": "q012",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04"
+          ],
+          "retrieved_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b",
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.22675
+        },
+        {
+          "query_id": "q013",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04"
+          ],
+          "retrieved_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b",
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.529458
+        },
+        {
+          "query_id": "q014",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04"
+          ],
+          "retrieved_chunk_ids": [
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b",
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 13.511541
+        },
+        {
+          "query_id": "q015",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3"
+          ],
+          "retrieved_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 19.211959
+        },
+        {
+          "query_id": "q016",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3"
+          ],
+          "retrieved_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "87613947-f1ff-5ae7-9610-9835fe112390"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.910667
+        },
+        {
+          "query_id": "q017",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df"
+          ],
+          "retrieved_chunk_ids": [
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "87613947-f1ff-5ae7-9610-9835fe112390"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.479
+        },
+        {
+          "query_id": "q018",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69"
+          ],
+          "retrieved_chunk_ids": [
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b",
+            "87613947-f1ff-5ae7-9610-9835fe112390"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.354583
+        },
+        {
+          "query_id": "q019",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69"
+          ],
+          "retrieved_chunk_ids": [
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 15.441333
+        },
+        {
+          "query_id": "q020",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a"
+          ],
+          "retrieved_chunk_ids": [
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.623375
+        },
+        {
+          "query_id": "q021",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3"
+          ],
+          "retrieved_chunk_ids": [
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "067f7c94-e52b-5f26-ace5-20769595800d",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.258292
+        },
+        {
+          "query_id": "q022",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3"
+          ],
+          "retrieved_chunk_ids": [
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "87613947-f1ff-5ae7-9610-9835fe112390"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 13.2675
+        },
+        {
+          "query_id": "q023",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6"
+          ],
+          "retrieved_chunk_ids": [
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "87613947-f1ff-5ae7-9610-9835fe112390",
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.243167
+        },
+        {
+          "query_id": "q024",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3"
+          ],
+          "retrieved_chunk_ids": [
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "3b85c60a-a16e-5b5e-81cb-558a910dba43",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "8435d8e5-feb7-5cef-9d0a-fb63e296481b"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 15.837125
+        },
+        {
+          "query_id": "q025",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3"
+          ],
+          "retrieved_chunk_ids": [
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04"
+          ],
+          "first_relevant_rank": 4,
+          "latency_ms": 11.842875
+        },
+        {
+          "query_id": "q026",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da"
+          ],
+          "retrieved_chunk_ids": [
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "37c59aee-a72d-55b3-a980-301afdc6fb3a",
+            "5e9623b6-f9ff-538e-a287-d9e929fedb69",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.547084
+        },
+        {
+          "query_id": "q027",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20"
+          ],
+          "retrieved_chunk_ids": [
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.292583
+        },
+        {
+          "query_id": "q028",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20"
+          ],
+          "retrieved_chunk_ids": [
+            "2ef6b6b7-1a2e-505b-95fc-21dcdfc12a20",
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "40b28bb6-af95-5783-a91e-a4bd6d84c654",
+            "3ea32e9f-0568-586b-a86e-465a09bb27c6",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 14.554542
+        },
+        {
+          "query_id": "q029",
+          "category": "multi_hop",
+          "relevant_chunk_ids": [
+            "a781f61a-307b-5330-8d65-bfe392b16781",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3"
+          ],
+          "retrieved_chunk_ids": [
+            "f1603c2d-6aee-55ca-b01f-7b96e55790df",
+            "ad3ff56d-ac2a-5955-abbe-8c18972b02d3",
+            "9c718dfe-5a2b-5b1f-bc6f-85112cb49483",
+            "ce874f1a-7e02-56b3-9682-706e56bdf7da",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 19.338958
+        },
+        {
+          "query_id": "q030",
+          "category": "unanswerable",
+          "relevant_chunk_ids": [],
+          "retrieved_chunk_ids": [
+            "0cf41dfd-1dc1-5306-87b8-810de6a78c04",
+            "fa06836e-cd0b-5e70-85dd-79b0245f05e3",
+            "e7dd79dd-bfc9-52f5-99a3-873c9da090a3",
+            "bafe9d32-31f7-52ae-8684-d7a30a42c8ef",
+            "067f7c94-e52b-5f26-ace5-20769595800d"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 15.965666
+        }
+      ]
+    },
+    "dense_recursive": {
+      "retriever": "dense",
+      "metrics": {
+        "query_count": 30,
+        "answerable_query_count": 29,
+        "unanswerable_query_count": 1,
+        "recall_at_k": {
+          "1": 0.655172,
+          "3": 0.965517,
+          "5": 0.965517
+        },
+        "precision_at_k": {
+          "1": 0.655172,
+          "3": 0.321839,
+          "5": 0.193103
+        },
+        "mrr_at_k": {
+          "1": 0.655172,
+          "3": 0.798851,
+          "5": 0.798851
+        },
+        "ndcg_at_k": {
+          "1": 0.655172,
+          "3": 0.833532,
+          "5": 0.833532
+        },
+        "mean_latency_ms": 10.95028,
+        "p95_latency_ms": 15.144739
+      },
+      "per_query": [
+        {
+          "query_id": "q001",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.85725
+        },
+        {
+          "query_id": "q002",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.697666
+        },
+        {
+          "query_id": "q003",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 11.355416
+        },
+        {
+          "query_id": "q004",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 3,
+          "latency_ms": 9.095208
+        },
+        {
+          "query_id": "q005",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.359417
+        },
+        {
+          "query_id": "q006",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.625125
+        },
+        {
+          "query_id": "q007",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.48325
+        },
+        {
+          "query_id": "q008",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 3,
+          "latency_ms": 11.001375
+        },
+        {
+          "query_id": "q009",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "retrieved_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 14.666125
+        },
+        {
+          "query_id": "q010",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.146792
+        },
+        {
+          "query_id": "q011",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.275125
+        },
+        {
+          "query_id": "q012",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.084416
+        },
+        {
+          "query_id": "q013",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.618875
+        },
+        {
+          "query_id": "q014",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 16.106417
+        },
+        {
+          "query_id": "q015",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.163583
+        },
+        {
+          "query_id": "q016",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.041625
+        },
+        {
+          "query_id": "q017",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 10.125541
+        },
+        {
+          "query_id": "q018",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "retrieved_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.9255
+        },
+        {
+          "query_id": "q019",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.018292
+        },
+        {
+          "query_id": "q020",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.685459
+        },
+        {
+          "query_id": "q021",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.058708
+        },
+        {
+          "query_id": "q022",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.303458
+        },
+        {
+          "query_id": "q023",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 8.773708
+        },
+        {
+          "query_id": "q024",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 14.236125
+        },
+        {
+          "query_id": "q025",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 10.43575
+        },
+        {
+          "query_id": "q026",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 11.079333
+        },
+        {
+          "query_id": "q027",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "retrieved_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.312417
+        },
+        {
+          "query_id": "q028",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "retrieved_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.9165
+        },
+        {
+          "query_id": "q029",
+          "category": "multi_hop",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.523625
+        },
+        {
+          "query_id": "q030",
+          "category": "unanswerable",
+          "relevant_chunk_ids": [],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 15.536333
+        }
+      ]
+    },
+    "bm25_recursive": {
+      "retriever": "bm25",
+      "metrics": {
+        "query_count": 30,
+        "answerable_query_count": 29,
+        "unanswerable_query_count": 1,
+        "recall_at_k": {
+          "1": 0.862069,
+          "3": 1.0,
+          "5": 1.0
+        },
+        "precision_at_k": {
+          "1": 0.862069,
+          "3": 0.333333,
+          "5": 0.2
+        },
+        "mrr_at_k": {
+          "1": 0.862069,
+          "3": 0.931034,
+          "5": 0.931034
+        },
+        "ndcg_at_k": {
+          "1": 0.862069,
+          "3": 0.935754,
+          "5": 0.935754
+        },
+        "mean_latency_ms": 0.08589,
+        "p95_latency_ms": 0.103215
+      },
+      "per_query": [
+        {
+          "query_id": "q001",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.100625
+        },
+        {
+          "query_id": "q002",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.097083
+        },
+        {
+          "query_id": "q003",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.092875
+        },
+        {
+          "query_id": "q004",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.098791
+        },
+        {
+          "query_id": "q005",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.076708
+        },
+        {
+          "query_id": "q006",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.097334
+        },
+        {
+          "query_id": "q007",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.090584
+        },
+        {
+          "query_id": "q008",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 0.08375
+        },
+        {
+          "query_id": "q009",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "retrieved_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.0825
+        },
+        {
+          "query_id": "q010",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.053834
+        },
+        {
+          "query_id": "q011",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.060833
+        },
+        {
+          "query_id": "q012",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 0.075667
+        },
+        {
+          "query_id": "q013",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.0705
+        },
+        {
+          "query_id": "q014",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.09025
+        },
+        {
+          "query_id": "q015",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.075916
+        },
+        {
+          "query_id": "q016",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.068417
+        },
+        {
+          "query_id": "q017",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 0.075333
+        },
+        {
+          "query_id": "q018",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "retrieved_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.105334
+        },
+        {
+          "query_id": "q019",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.075459
+        },
+        {
+          "query_id": "q020",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.075334
+        },
+        {
+          "query_id": "q021",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.089458
+        },
+        {
+          "query_id": "q022",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.0995
+        },
+        {
+          "query_id": "q023",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 0.097209
+        },
+        {
+          "query_id": "q024",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.089375
+        },
+        {
+          "query_id": "q025",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "retrieved_chunk_ids": [
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.094458
+        },
+        {
+          "query_id": "q026",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.083458
+        },
+        {
+          "query_id": "q027",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "retrieved_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.096125
+        },
+        {
+          "query_id": "q028",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "retrieved_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.094625
+        },
+        {
+          "query_id": "q029",
+          "category": "multi_hop",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 0.124125
+        },
+        {
+          "query_id": "q030",
+          "category": "unanswerable",
+          "relevant_chunk_ids": [],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 0.06125
+        }
+      ]
+    },
+    "hybrid_recursive": {
+      "retriever": "hybrid_rrf",
+      "metrics": {
+        "query_count": 30,
+        "answerable_query_count": 29,
+        "unanswerable_query_count": 1,
+        "recall_at_k": {
+          "1": 0.827586,
+          "3": 1.0,
+          "5": 1.0
+        },
+        "precision_at_k": {
+          "1": 0.827586,
+          "3": 0.333333,
+          "5": 0.2
+        },
+        "mrr_at_k": {
+          "1": 0.827586,
+          "3": 0.913793,
+          "5": 0.913793
+        },
+        "ndcg_at_k": {
+          "1": 0.827586,
+          "3": 0.923027,
+          "5": 0.923027
+        },
+        "mean_latency_ms": 11.255283,
+        "p95_latency_ms": 15.601521
+      },
+      "per_query": [
+        {
+          "query_id": "q001",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.942667
+        },
+        {
+          "query_id": "q002",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 16.179666
+        },
+        {
+          "query_id": "q003",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.420167
+        },
+        {
+          "query_id": "q004",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 9.886375
+        },
+        {
+          "query_id": "q005",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.031583
+        },
+        {
+          "query_id": "q006",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.66625
+        },
+        {
+          "query_id": "q007",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.492208
+        },
+        {
+          "query_id": "q008",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 10.7335
+        },
+        {
+          "query_id": "q009",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "retrieved_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 12.632209
+        },
+        {
+          "query_id": "q010",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.117833
+        },
+        {
+          "query_id": "q011",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.067791
+        },
+        {
+          "query_id": "q012",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 13.541791
+        },
+        {
+          "query_id": "q013",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.849167
+        },
+        {
+          "query_id": "q014",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 15.748708
+        },
+        {
+          "query_id": "q015",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.088667
+        },
+        {
+          "query_id": "q016",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.066958
+        },
+        {
+          "query_id": "q017",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 13.718209
+        },
+        {
+          "query_id": "q018",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "retrieved_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.00025
+        },
+        {
+          "query_id": "q019",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.112417
+        },
+        {
+          "query_id": "q020",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 11.006333
+        },
+        {
+          "query_id": "q021",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 11.354083
+        },
+        {
+          "query_id": "q022",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 11.249875
+        },
+        {
+          "query_id": "q023",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "retrieved_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 15.421625
+        },
+        {
+          "query_id": "q024",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 10.168333
+        },
+        {
+          "query_id": "q025",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 11.253667
+        },
+        {
+          "query_id": "q026",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 14.166917
+        },
+        {
+          "query_id": "q027",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "retrieved_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 8.522916
+        },
+        {
+          "query_id": "q028",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "retrieved_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 9.774958
+        },
+        {
+          "query_id": "q029",
+          "category": "multi_hop",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 11.792667
+        },
+        {
+          "query_id": "q030",
+          "category": "unanswerable",
+          "relevant_chunk_ids": [],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 9.650708
+        }
+      ]
+    },
+    "reranked_recursive": {
+      "retriever": "hybrid_reranked",
+      "metrics": {
+        "query_count": 30,
+        "answerable_query_count": 29,
+        "unanswerable_query_count": 1,
+        "recall_at_k": {
+          "1": 0.827586,
+          "3": 1.0,
+          "5": 1.0
+        },
+        "precision_at_k": {
+          "1": 0.827586,
+          "3": 0.344828,
+          "5": 0.206897
+        },
+        "mrr_at_k": {
+          "1": 0.827586,
+          "3": 0.913793,
+          "5": 0.913793
+        },
+        "ndcg_at_k": {
+          "1": 0.827586,
+          "3": 0.933599,
+          "5": 0.933599
+        },
+        "mean_latency_ms": 96.707778,
+        "p95_latency_ms": 114.736979
+      },
+      "per_query": [
+        {
+          "query_id": "q001",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 114.827166
+        },
+        {
+          "query_id": "q002",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 101.072292
+        },
+        {
+          "query_id": "q003",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 90.956
+        },
+        {
+          "query_id": "q004",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 88.22375
+        },
+        {
+          "query_id": "q005",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 87.795083
+        },
+        {
+          "query_id": "q006",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 111.765667
+        },
+        {
+          "query_id": "q007",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 114.302083
+        },
+        {
+          "query_id": "q008",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "retrieved_chunk_ids": [
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 89.901542
+        },
+        {
+          "query_id": "q009",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "retrieved_chunk_ids": [
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 90.526917
+        },
+        {
+          "query_id": "q010",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 107.274041
+        },
+        {
+          "query_id": "q011",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "retrieved_chunk_ids": [
+            "807f953b-8650-52e2-afbf-1a4c8daadd26",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 117.0105
+        },
+        {
+          "query_id": "q012",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 94.211125
+        },
+        {
+          "query_id": "q013",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 89.466
+        },
+        {
+          "query_id": "q014",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0"
+          ],
+          "retrieved_chunk_ids": [
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 93.702292
+        },
+        {
+          "query_id": "q015",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 104.191125
+        },
+        {
+          "query_id": "q016",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 87.469959
+        },
+        {
+          "query_id": "q017",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 91.204708
+        },
+        {
+          "query_id": "q018",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30"
+          ],
+          "retrieved_chunk_ids": [
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 88.228542
+        },
+        {
+          "query_id": "q019",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "807f953b-8650-52e2-afbf-1a4c8daadd26"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 87.662417
+        },
+        {
+          "query_id": "q020",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd"
+          ],
+          "retrieved_chunk_ids": [
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 99.53875
+        },
+        {
+          "query_id": "q021",
+          "category": "semantic",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "2fce80aa-e7a9-5cca-84ff-4c917f91ea44"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 93.151042
+        },
+        {
+          "query_id": "q022",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "retrieved_chunk_ids": [
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 93.749
+        },
+        {
+          "query_id": "q023",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e"
+          ],
+          "retrieved_chunk_ids": [
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 88.257709
+        },
+        {
+          "query_id": "q024",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "e6ec4af4-8f72-59a6-a4f0-9151ff8e2b59",
+            "9283c50b-35cb-5956-b249-1e59d37fc2f7",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 111.938792
+        },
+        {
+          "query_id": "q025",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "eab15b6f-560c-539a-a7ec-8f5f36106654"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "first_relevant_rank": 2,
+          "latency_ms": 89.263333
+        },
+        {
+          "query_id": "q026",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe"
+          ],
+          "retrieved_chunk_ids": [
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "f7f18ddb-bcbe-5b0a-bf6e-9b1226fb27cd",
+            "3b2e2a1d-e84f-5cee-a0d0-86dee380c52e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 89.801208
+        },
+        {
+          "query_id": "q027",
+          "category": "adversarial",
+          "relevant_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef"
+          ],
+          "retrieved_chunk_ids": [
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "aae470d6-c020-54f6-b205-ad2d1031cb95"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 90.844417
+        },
+        {
+          "query_id": "q028",
+          "category": "direct",
+          "relevant_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "retrieved_chunk_ids": [
+            "e6323616-d233-50f5-ac8f-ae9766294c0d",
+            "d626c33c-bc71-5af0-b072-984f1a3789ef",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "ebb7b3e0-9bff-5380-be1c-7a17c2c8a883",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 89.339583
+        },
+        {
+          "query_id": "q029",
+          "category": "multi_hop",
+          "relevant_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "8918771e-e736-5f64-a6f6-56a171ef446c"
+          ],
+          "retrieved_chunk_ids": [
+            "079069e4-82f2-5d3d-8770-dd3d8243d578",
+            "7602b06c-8dbe-523f-b3c5-222b95915c1e",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "6b42c64d-55a5-52cf-a571-d930863068fe",
+            "e6323616-d233-50f5-ac8f-ae9766294c0d"
+          ],
+          "first_relevant_rank": 1,
+          "latency_ms": 114.62675
+        },
+        {
+          "query_id": "q030",
+          "category": "unanswerable",
+          "relevant_chunk_ids": [],
+          "retrieved_chunk_ids": [
+            "c886b702-1f86-5f01-81ed-0515df146cf0",
+            "badf88b1-a6e3-50c3-9ea3-424f9fb61c30",
+            "eab15b6f-560c-539a-a7ec-8f5f36106654",
+            "8918771e-e736-5f64-a6f6-56a171ef446c",
+            "a047afbe-fb7d-596d-9aea-6fac2dcbeaff"
+          ],
+          "first_relevant_rank": null,
+          "latency_ms": 90.931542
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "dense_vs_bm25": {
+      "dense_wins": [
+        "q012"
+      ],
+      "bm25_wins": [
+        "q002",
+        "q004",
+        "q007",
+        "q008",
+        "q014",
+        "q022",
+        "q025",
+        "q029"
+      ],
+      "ties": 21
+    },
+    "fixed_vs_recursive_dense": {
+      "recall_at_5_delta": -0.034483,
+      "mrr_at_5_delta": 0.043104
+    },
+    "hybrid_vs_dense": {
+      "recall_at_5_delta": 0.034483,
+      "mrr_at_5_delta": 0.114942
+    },
+    "reranker_vs_hybrid": {
+      "recall_at_5_delta": 0.0,
+      "mrr_at_5_delta": 0.0,
+      "mean_latency_ms_delta": 85.452495
+    },
+    "reranked_failures_at_5": []
+  }
+}

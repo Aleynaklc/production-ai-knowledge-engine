@@ -1,0 +1,10 @@
+NovaStack Support FAQ
+
+The public status page is status.novastack.example. Customers should check it before opening a ticket about a broad outage. The status page reports current incidents and the previous 90 days of availability history.
+
+Standard support operates Monday through Friday, 08:00 to 18:00 UTC, excluding company holidays. Enterprise plans include 24-hour coverage for severity-one incidents. A severity-one ticket means a production outage or widespread loss of a critical function; a single-user problem is not severity one.
+
+The initial response target is 30 minutes for severity one, four business hours for severity two, and one business day for severity three. These are response targets, not resolution guarantees. Tickets should include the tenant ID, UTC timestamps, request IDs, and a concise reproduction path, but they must not include passwords or access tokens.
+
+Customers can export account data from Settings > Data Export. An export link is emailed to account owners and expires after 48 hours. Billing invoices are available from Settings > Billing and remain downloadable for seven years.
+

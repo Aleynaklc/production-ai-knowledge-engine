@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "source_directory": "data/raw",
+  "tokenizer": {
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8"
+  },
+  "strategies": {
+    "fixed": {
+      "document_count": 9,
+      "chunk_count": 18,
+      "average_chunk_tokens": 131.88888888888889,
+      "average_chunk_characters": 680.0555555555555,
+      "strategy": "fixed",
+      "chunk_size_tokens": 160,
+      "overlap_tokens": 30
+    },
+    "recursive": {
+      "document_count": 9,
+      "chunk_count": 18,
+      "average_chunk_tokens": 131.83333333333334,
+      "average_chunk_characters": 683.2222222222222,
+      "strategy": "recursive",
+      "chunk_size_tokens": 160,
+      "overlap_tokens": 30
+    }
+  }
+}

@@ -1,6 +1,7 @@
 """Typed application configuration loaded from environment variables."""
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
@@ -21,6 +22,18 @@ class Settings(BaseSettings):
     model_revision: str = "c89bee90d9f811437d9735454613c35b4a3c4dc8"
     device: Literal["auto", "cpu", "mps", "cuda"] = "auto"
     max_new_tokens: int = Field(default=128, ge=1, le=2_048)
+    chunk_strategy: Literal["fixed", "recursive"] = "recursive"
+    chunk_size_tokens: int = Field(default=160, ge=32, le=1_024)
+    chunk_overlap_tokens: int = Field(default=30, ge=0, le=256)
+    embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_model_revision: str = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
+    reranker_model_name: str = "cross-encoder/ms-marco-MiniLM-L6-v2"
+    reranker_model_revision: str = "233902d25c440f23af6f7d6e94d2946bac0bee0a"
+    retrieval_device: Literal["auto", "cpu", "mps", "cuda"] = "auto"
+    qdrant_path: Path = Path("data/qdrant")
+    qdrant_collection: str = "novastack_chunks"
+    retrieval_top_k: int = Field(default=5, ge=1, le=100)
+    retrieval_candidate_k: int = Field(default=20, ge=2, le=200)
 
     model_config = SettingsConfigDict(
         env_file=".env",

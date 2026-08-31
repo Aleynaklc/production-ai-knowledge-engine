@@ -28,12 +28,11 @@ venv/
 .vscode/
 
 # Local data and model artifacts
-data/raw/*
 data/processed/*
+data/qdrant/
 models/
 *.safetensors
 *.bin
 
 # Keep future data directories in Git with placeholder files.
-!data/raw/.gitkeep
 !data/processed/.gitkeep
