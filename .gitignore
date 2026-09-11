@@ -30,6 +30,7 @@ venv/
 # Local data and model artifacts
 data/processed/*
 data/qdrant/
+data/uploads/
 models/
 *.safetensors
 *.bin

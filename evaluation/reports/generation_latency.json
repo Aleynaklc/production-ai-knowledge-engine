@@ -1,0 +1,574 @@
+{
+  "schema_version": 1,
+  "benchmark": "generation_latency",
+  "created_at": "2026-09-10T09:37:32.208589+00:00",
+  "model": {
+    "model_name": "Qwen/Qwen2.5-0.5B-Instruct",
+    "requested_revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8",
+    "resolved_revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8",
+    "device": "cpu",
+    "dtype": "float32",
+    "load_seconds": 2.551208,
+    "parameter_count": 494032768,
+    "parameter_bytes": 1976131072
+  },
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "processor_or_accelerator": "arm",
+    "python": "3.12.13",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "torch_num_threads": 4,
+    "torch_num_interop_threads": 8
+  },
+  "config": {
+    "repeats": 3,
+    "warmup_runs": 1,
+    "seed": 42,
+    "do_sample": false,
+    "system_prompt": "You are a concise and helpful AI assistant."
+  },
+  "profiles": [
+    {
+      "name": "short_output_32",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 32
+    },
+    {
+      "name": "short_output_64",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 64
+    },
+    {
+      "name": "medium_output_32",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 2: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 3: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 4: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 5: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 6: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 7: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 8: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 32
+    },
+    {
+      "name": "medium_output_64",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 2: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 3: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 4: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 5: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 6: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 7: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 8: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 64
+    },
+    {
+      "name": "long_output_32",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 2: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 3: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 4: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 5: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 6: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 7: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 8: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 9: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 10: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 11: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 12: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 13: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 14: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 15: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 16: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 17: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 18: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 19: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 20: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 21: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 22: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 23: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 24: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 32
+    },
+    {
+      "name": "long_output_64",
+      "prompt": "Reference 1: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 2: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 3: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 4: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 5: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 6: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 7: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 8: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 9: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 10: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 11: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 12: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 13: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 14: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 15: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 16: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 17: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 18: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 19: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 20: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 21: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 22: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 23: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nReference 24: The knowledge service indexes internal documents. It retrieves supporting passages before answering. Answers include source citations. If the evidence does not support an answer, the service abstains.\nExplain the service's retrieval, grounded answering, citations, and abstention behavior in detail. Use complete sentences.",
+      "max_new_tokens": 64
+    }
+  ],
+  "prompt_sha256": {
+    "short_output_32": "5e0b4db3f9cff02ec81d51dcec135ddee00e430789117a94640529beae678015",
+    "short_output_64": "5e0b4db3f9cff02ec81d51dcec135ddee00e430789117a94640529beae678015",
+    "medium_output_32": "31bf4a671e4128671bbc329ee55ea1b1048eed4104bb63787e39c678003ca67e",
+    "medium_output_64": "31bf4a671e4128671bbc329ee55ea1b1048eed4104bb63787e39c678003ca67e",
+    "long_output_32": "f8f65b692b8348736677f01848ba8f212cfe92e68c9a542e66dc42c008aa1814",
+    "long_output_64": "f8f65b692b8348736677f01848ba8f212cfe92e68c9a542e66dc42c008aa1814"
+  },
+  "model_load_seconds": 2.551251,
+  "model_load_timing": "CLI wall time for tokenizer/model loading and final device synchronization; may include downloads and cache access",
+  "warmup_runs_discarded": 6,
+  "measurement_notes": [
+    "Generation timing brackets synchronized model.generate, including prefill and autoregressive decoding; it excludes prompt tokenization and output text decoding.",
+    "Request timing brackets generate_text, including tokenization, device transfer, generation, and output text decoding. Model loading and warmups are excluded.",
+    "Output tokens/sec is sum(actual output tokens) / sum(generation seconds) per profile. The output cap is a maximum; EOS may end generation earlier, and token counts include generated special tokens.",
+    "Percentiles use NumPy linear interpolation. Small repeat counts provide smoke measurements, not reliable production tail-latency estimates.",
+    "Trials are single-request, batch size one, with seeded shuffled profile order in each repetition. Seed equals base seed plus repetition modulo 2**32. Greedy is the default; fixed seeds do not guarantee bitwise determinism across hardware."
+  ],
+  "ttft_seconds": null,
+  "ttft_unavailable_reason": "The existing non-streaming generate_text call has no first-token timestamp. Full generation latency is not a TTFT estimate.",
+  "summaries": [
+    {
+      "profile": "short_output_32",
+      "measured_runs": 3,
+      "input_tokens_min": 82,
+      "input_tokens_max": 82,
+      "output_tokens_min": 32,
+      "output_tokens_max": 32,
+      "mean_output_tokens": 32.0,
+      "generation_seconds_p50": 2.386583,
+      "generation_seconds_p95": 3.261397,
+      "request_seconds_p50": 2.387375,
+      "request_seconds_p95": 3.269092,
+      "output_tokens_per_second": 11.882523,
+      "output_cap_hit_rate": 1.0
+    },
+    {
+      "profile": "short_output_64",
+      "measured_runs": 3,
+      "input_tokens_min": 82,
+      "input_tokens_max": 82,
+      "output_tokens_min": 64,
+      "output_tokens_max": 64,
+      "mean_output_tokens": 64.0,
+      "generation_seconds_p50": 4.766657,
+      "generation_seconds_p95": 5.120874,
+      "request_seconds_p50": 4.767916,
+      "request_seconds_p95": 5.123778,
+      "output_tokens_per_second": 13.283636,
+      "output_cap_hit_rate": 1.0
+    },
+    {
+      "profile": "medium_output_32",
+      "measured_runs": 3,
+      "input_tokens_min": 341,
+      "input_tokens_max": 341,
+      "output_tokens_min": 32,
+      "output_tokens_max": 32,
+      "mean_output_tokens": 32.0,
+      "generation_seconds_p50": 2.745134,
+      "generation_seconds_p95": 6.87947,
+      "request_seconds_p50": 2.748902,
+      "request_seconds_p95": 6.884001,
+      "output_tokens_per_second": 7.485606,
+      "output_cap_hit_rate": 1.0
+    },
+    {
+      "profile": "medium_output_64",
+      "measured_runs": 3,
+      "input_tokens_min": 341,
+      "input_tokens_max": 341,
+      "output_tokens_min": 64,
+      "output_tokens_max": 64,
+      "mean_output_tokens": 64.0,
+      "generation_seconds_p50": 5.071353,
+      "generation_seconds_p95": 5.476138,
+      "request_seconds_p50": 5.073044,
+      "request_seconds_p95": 5.479661,
+      "output_tokens_per_second": 12.35886,
+      "output_cap_hit_rate": 1.0
+    },
+    {
+      "profile": "long_output_32",
+      "measured_runs": 3,
+      "input_tokens_min": 948,
+      "input_tokens_max": 948,
+      "output_tokens_min": 32,
+      "output_tokens_max": 32,
+      "mean_output_tokens": 32.0,
+      "generation_seconds_p50": 3.338535,
+      "generation_seconds_p95": 3.516747,
+      "request_seconds_p50": 3.343558,
+      "request_seconds_p95": 3.523645,
+      "output_tokens_per_second": 9.433123,
+      "output_cap_hit_rate": 1.0
+    },
+    {
+      "profile": "long_output_64",
+      "measured_runs": 3,
+      "input_tokens_min": 948,
+      "input_tokens_max": 948,
+      "output_tokens_min": 64,
+      "output_tokens_max": 64,
+      "mean_output_tokens": 64.0,
+      "generation_seconds_p50": 5.710414,
+      "generation_seconds_p95": 5.878072,
+      "request_seconds_p50": 5.714788,
+      "request_seconds_p95": 5.882147,
+      "output_tokens_per_second": 11.129532,
+      "output_cap_hit_rate": 1.0
+    }
+  ],
+  "trials": [
+    {
+      "profile": "medium_output_64",
+      "repetition": 0,
+      "execution_order": 0,
+      "request_seconds": 5.524841,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let's break down each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the information that",
+        "input_tokens": 341,
+        "output_tokens": 64,
+        "generation_seconds": 5.521114,
+        "tokens_per_second": 11.591863,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_64",
+      "repetition": 0,
+      "execution_order": 1,
+      "request_seconds": 5.163318,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to ensure that the answers provided are accurate and relevant to the user's query. Here's a detailed breakdown of its behavior:\n\n1. **Indexing**: The service",
+        "input_tokens": 82,
+        "output_tokens": 64,
+        "generation_seconds": 5.160231,
+        "tokens_per_second": 12.402545,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "medium_output_32",
+      "repetition": 0,
+      "execution_order": 2,
+      "request_seconds": 7.343457,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let",
+        "input_tokens": 341,
+        "output_tokens": 32,
+        "generation_seconds": 7.338841,
+        "tokens_per_second": 4.360362,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_32",
+      "repetition": 0,
+      "execution_order": 3,
+      "request_seconds": 3.343558,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here",
+        "input_tokens": 948,
+        "output_tokens": 32,
+        "generation_seconds": 3.338535,
+        "tokens_per_second": 9.585043,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_32",
+      "repetition": 0,
+      "execution_order": 4,
+      "request_seconds": 2.387375,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to",
+        "input_tokens": 82,
+        "output_tokens": 32,
+        "generation_seconds": 2.386583,
+        "tokens_per_second": 13.408289,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_64",
+      "repetition": 0,
+      "execution_order": 5,
+      "request_seconds": 5.648619,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here's a detailed explanation of each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the",
+        "input_tokens": 948,
+        "output_tokens": 64,
+        "generation_seconds": 5.644285,
+        "tokens_per_second": 11.338903,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 42,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "medium_output_64",
+      "repetition": 1,
+      "execution_order": 6,
+      "request_seconds": 4.945918,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let's break down each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the information that",
+        "input_tokens": 341,
+        "output_tokens": 64,
+        "generation_seconds": 4.942947,
+        "tokens_per_second": 12.947742,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_32",
+      "repetition": 1,
+      "execution_order": 7,
+      "request_seconds": 2.334667,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to",
+        "input_tokens": 82,
+        "output_tokens": 32,
+        "generation_seconds": 2.33391,
+        "tokens_per_second": 13.7109,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "medium_output_32",
+      "repetition": 1,
+      "execution_order": 8,
+      "request_seconds": 2.741761,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let",
+        "input_tokens": 341,
+        "output_tokens": 32,
+        "generation_seconds": 2.740638,
+        "tokens_per_second": 11.676114,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_32",
+      "repetition": 1,
+      "execution_order": 9,
+      "request_seconds": 3.304378,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here",
+        "input_tokens": 948,
+        "output_tokens": 32,
+        "generation_seconds": 3.301822,
+        "tokens_per_second": 9.691619,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_64",
+      "repetition": 1,
+      "execution_order": 10,
+      "request_seconds": 5.900742,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here's a detailed explanation of each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the",
+        "input_tokens": 948,
+        "output_tokens": 64,
+        "generation_seconds": 5.896701,
+        "tokens_per_second": 10.853526,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_64",
+      "repetition": 1,
+      "execution_order": 11,
+      "request_seconds": 4.767916,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to ensure that the answers provided are accurate and relevant to the user's query. Here's a detailed breakdown of its behavior:\n\n1. **Indexing**: The service",
+        "input_tokens": 82,
+        "output_tokens": 64,
+        "generation_seconds": 4.766657,
+        "tokens_per_second": 13.426599,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 43,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "medium_output_64",
+      "repetition": 2,
+      "execution_order": 12,
+      "request_seconds": 5.073044,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let's break down each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the information that",
+        "input_tokens": 341,
+        "output_tokens": 64,
+        "generation_seconds": 5.071353,
+        "tokens_per_second": 12.619906,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_64",
+      "repetition": 2,
+      "execution_order": 13,
+      "request_seconds": 4.529298,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to ensure that the answers provided are accurate and relevant to the user's query. Here's a detailed breakdown of its behavior:\n\n1. **Indexing**: The service",
+        "input_tokens": 82,
+        "output_tokens": 64,
+        "generation_seconds": 4.526986,
+        "tokens_per_second": 14.137443,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "medium_output_32",
+      "repetition": 2,
+      "execution_order": 14,
+      "request_seconds": 2.748902,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Let",
+        "input_tokens": 341,
+        "output_tokens": 32,
+        "generation_seconds": 2.745134,
+        "tokens_per_second": 11.656991,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "short_output_32",
+      "repetition": 2,
+      "execution_order": 15,
+      "request_seconds": 3.367061,
+      "result": {
+        "text": "The service in question is a knowledge management system designed to provide users with structured and organized information. It employs a combination of indexing, retrieval, and grounded answering to",
+        "input_tokens": 82,
+        "output_tokens": 32,
+        "generation_seconds": 3.358599,
+        "tokens_per_second": 9.527781,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_32",
+      "repetition": 2,
+      "execution_order": 16,
+      "request_seconds": 3.543655,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here",
+        "input_tokens": 948,
+        "output_tokens": 32,
+        "generation_seconds": 3.536548,
+        "tokens_per_second": 9.048372,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 32,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    },
+    {
+      "profile": "long_output_64",
+      "repetition": 2,
+      "execution_order": 17,
+      "request_seconds": 5.714788,
+      "result": {
+        "text": "The service's retrieval, grounded answering, citations, and abstention behavior are designed to ensure that the answers provided by the knowledge service are accurate and reliable. Here's a detailed explanation of each component:\n\n1. **Retrieval**: The service retrieves supporting passages before answering. This means that the answers are based on the",
+        "input_tokens": 948,
+        "output_tokens": 64,
+        "generation_seconds": 5.710414,
+        "tokens_per_second": 11.207594,
+        "options": {
+          "temperature": 0.7,
+          "top_k": 50,
+          "top_p": 0.9,
+          "max_new_tokens": 64,
+          "repetition_penalty": 1.0,
+          "seed": 44,
+          "do_sample": false
+        }
+      }
+    }
+  ]
+}

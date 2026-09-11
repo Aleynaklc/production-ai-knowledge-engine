@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from typing import cast
 
 from qdrant_client import QdrantClient
 
@@ -25,8 +24,7 @@ def _resolved_path(path: Path) -> Path:
 
 def _load_labels(strategy: str) -> list[RetrievalEvaluationQuery]:
     path = PROJECT_ROOT / f"data/evaluation/retrieval_queries_{strategy}.jsonl"
-    queries = read_queries(path, RetrievalEvaluationQuery)
-    return cast(list[RetrievalEvaluationQuery], queries)
+    return read_queries(path, RetrievalEvaluationQuery)
 
 
 def _rank(item: object) -> int:
@@ -258,7 +256,11 @@ def main() -> None:
 
     comparison = _comparison(evaluations)
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "metric_definitions": {
+            "recall_at_k": "fraction of labeled relevant chunks retrieved, macro-averaged",
+            "hit_rate_at_k": "fraction of answerable queries with at least one relevant hit",
+        },
         "corpus": {
             "documents": len({chunk.document_id for chunk in recursive_chunks}),
             "fixed_chunks": len(fixed_chunks),

@@ -4,7 +4,7 @@ import math
 from time import perf_counter
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from backend.app.evaluation.dataset import RetrievalEvaluationQuery
 from backend.app.retrieval.models import Retriever
@@ -32,11 +32,13 @@ class RetrievalMetrics(BaseModel):
     answerable_query_count: int
     unanswerable_query_count: int
     recall_at_k: dict[str, float]
+    hit_rate_at_k: dict[str, float] = Field(default_factory=dict)
     precision_at_k: dict[str, float]
     mrr_at_k: dict[str, float]
     ndcg_at_k: dict[str, float]
     mean_latency_ms: float
     p95_latency_ms: float
+    p50_latency_ms: float = 0.0
 
 
 class RetrievalEvaluation(BaseModel):
@@ -57,11 +59,13 @@ def _first_relevant_rank(retrieved: list[str], relevant: set[str], top_k: int) -
 
 
 def _ndcg(retrieved: list[str], relevant: set[str], top_k: int) -> float:
-    dcg = sum(
-        1.0 / math.log2(rank + 1)
-        for rank, chunk_id in enumerate(retrieved[:top_k], start=1)
-        if chunk_id in relevant
-    )
+    seen: set[str] = set()
+    gains: list[float] = []
+    for rank, chunk_id in enumerate(retrieved[:top_k], start=1):
+        if chunk_id in relevant and chunk_id not in seen:
+            gains.append(1.0 / math.log2(rank + 1))
+        seen.add(chunk_id)
+    dcg = sum(gains)
     ideal_count = min(len(relevant), top_k)
     ideal = sum(1.0 / math.log2(rank + 1) for rank in range(1, ideal_count + 1))
     return dcg / ideal if ideal else 0.0
@@ -78,15 +82,24 @@ def evaluate_retriever(
 
     if not queries:
         raise ValueError("Evaluation requires at least one query")
+    if max_k <= 0 or not cutoffs or any(cutoff <= 0 for cutoff in cutoffs):
+        raise ValueError("max_k and metric cutoffs must be positive")
+    if len(cutoffs) != len(set(cutoffs)):
+        raise ValueError("Metric cutoffs must be unique")
     if max(cutoffs) > max_k:
         raise ValueError("Every metric cutoff must be at most max_k")
+    if len({query.id for query in queries}) != len(queries):
+        raise ValueError("Evaluation query IDs must be unique")
+    if not any(query.relevant_chunk_ids for query in queries):
+        raise ValueError("Evaluation requires at least one answerable query")
 
     per_query: list[QueryEvaluation] = []
     for query in queries:
         started_at = perf_counter()
         results = retriever.retrieve(query.question, top_k=max_k)
         elapsed_ms = (perf_counter() - started_at) * 1_000
-        retrieved = [result.chunk.chunk_id for result in results]
+        # Duplicate results occupy a rank but cannot earn credit more than once.
+        retrieved = [result.chunk.chunk_id for result in results[:max_k]]
         relevant = set(query.relevant_chunk_ids)
         per_query.append(
             QueryEvaluation(
@@ -104,25 +117,29 @@ def evaluate_retriever(
         raise ValueError("Evaluation requires at least one answerable query")
 
     recall: dict[str, float] = {}
+    hit_rate: dict[str, float] = {}
     precision: dict[str, float] = {}
     mrr: dict[str, float] = {}
     ndcg: dict[str, float] = {}
     for cutoff in cutoffs:
         recalls: list[float] = []
+        hit_rates: list[float] = []
         precisions: list[float] = []
         reciprocal_ranks: list[float] = []
         ndcgs: list[float] = []
         for item in answerable:
             relevant = set(item.relevant_chunk_ids)
             retrieved = item.retrieved_chunk_ids[:cutoff]
-            hits = sum(chunk_id in relevant for chunk_id in retrieved)
+            hits = len(set(retrieved) & relevant)
             rank = _first_relevant_rank(retrieved, relevant, cutoff)
-            recalls.append(float(hits > 0))
+            recalls.append(hits / len(relevant))
+            hit_rates.append(float(hits > 0))
             precisions.append(hits / cutoff)
             reciprocal_ranks.append(1.0 / rank if rank is not None else 0.0)
             ndcgs.append(_ndcg(retrieved, relevant, cutoff))
         key = str(cutoff)
         recall[key] = round(float(np.mean(recalls)), 6)
+        hit_rate[key] = round(float(np.mean(hit_rates)), 6)
         precision[key] = round(float(np.mean(precisions)), 6)
         mrr[key] = round(float(np.mean(reciprocal_ranks)), 6)
         ndcg[key] = round(float(np.mean(ndcgs)), 6)
@@ -135,11 +152,13 @@ def evaluate_retriever(
             answerable_query_count=len(answerable),
             unanswerable_query_count=len(queries) - len(answerable),
             recall_at_k=recall,
+            hit_rate_at_k=hit_rate,
             precision_at_k=precision,
             mrr_at_k=mrr,
             ndcg_at_k=ndcg,
             mean_latency_ms=round(float(np.mean(latencies)), 6),
             p95_latency_ms=round(float(np.percentile(latencies, 95)), 6),
+            p50_latency_ms=round(float(np.percentile(latencies, 50)), 6),
         ),
         per_query=per_query,
     )

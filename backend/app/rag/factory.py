@@ -1,5 +1,7 @@
 """Composition root for the fully local grounded RAG runtime."""
 
+import hashlib
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
@@ -7,9 +9,13 @@ from threading import Lock
 from qdrant_client import QdrantClient
 
 from backend.app.config import Settings
+from backend.app.documents.library import DocumentLibrary
+from backend.app.embeddings.base import Embedder
 from backend.app.embeddings.sentence_transformer import SentenceTransformerEmbedder
-from backend.app.ingestion.chunkers import HuggingFaceTokenCodec
-from backend.app.ingestion.pipeline import read_chunks
+from backend.app.ingestion.chunkers import HuggingFaceTokenCodec, RecursiveChunker
+from backend.app.ingestion.models import DocumentChunk
+from backend.app.ingestion.parser import load_documents
+from backend.app.ingestion.pipeline import build_chunks, read_chunks
 from backend.app.llm.generation import GenerationOptions
 from backend.app.llm.model import load_runtime
 from backend.app.rag.context import ContextBuilder
@@ -19,10 +25,60 @@ from backend.app.rag.models import RAGAnswer
 from backend.app.rag.service import RAGService
 from backend.app.retrieval.dense import QdrantDenseRetriever
 from backend.app.retrieval.hybrid import HybridRetriever
-from backend.app.retrieval.reranker import CrossEncoderScorer, RerankedRetriever
+from backend.app.retrieval.reranker import CrossEncoderScorer, PairScorer, RerankedRetriever
 from backend.app.retrieval.sparse import BM25Retriever
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+logger = logging.getLogger(__name__)
+
+
+def _base_chunks(settings: Settings, project_root: Path) -> list[DocumentChunk]:
+    """Reuse prepared base chunks, or prepare the demo corpus on first use."""
+
+    path = project_root / "data/processed/chunks_recursive.jsonl"
+    if path.is_file():
+        return read_chunks(path)
+    documents = load_documents(project_root / "data/raw")
+    if not documents:
+        return []
+    codec = HuggingFaceTokenCodec.from_pretrained(settings.model_name, settings.model_revision)
+    return build_chunks(
+        documents,
+        RecursiveChunker(codec, settings.chunk_size_tokens, settings.chunk_overlap_tokens),
+    )
+
+
+def _collection_name(settings: Settings, chunks: list[DocumentChunk]) -> str:
+    fingerprint = hashlib.sha256()
+    fingerprint.update(
+        f"{settings.embedding_model_name}@{settings.embedding_model_revision}".encode()
+    )
+    for chunk in chunks:
+        fingerprint.update(chunk.model_dump_json().encode("utf-8"))
+        fingerprint.update(b"\n")
+    return f"{settings.qdrant_collection}_serving_{fingerprint.hexdigest()[:24]}"
+
+
+def _build_retriever(
+    settings: Settings,
+    client: QdrantClient,
+    embedding: Embedder,
+    scorer: PairScorer,
+    chunks: list[DocumentChunk],
+    collection: str,
+) -> RerankedRetriever:
+    """Build a complete replacement before switching the live service to it."""
+
+    sparse = BM25Retriever(chunks)
+    dense = QdrantDenseRetriever(embedding, collection, client=client)
+    try:
+        dense.index(chunks)
+    except Exception:
+        if client.collection_exists(collection):
+            client.delete_collection(collection)
+        raise
+    hybrid = HybridRetriever(dense, sparse, settings.retrieval_candidate_k)
+    return RerankedRetriever(hybrid, scorer, settings.retrieval_candidate_k)
 
 
 @dataclass(slots=True)
@@ -31,15 +87,46 @@ class RAGRuntime:
 
     service: RAGService
     qdrant_client: QdrantClient
+    embedder: Embedder
+    scorer: PairScorer
+    settings: Settings
+    collection_name: str
+
+    def refresh(self, chunks: list[DocumentChunk]) -> None:
+        """Refresh both dense and lexical retrieval while reusing all loaded models."""
+
+        collection = _collection_name(self.settings, chunks)
+        if collection == self.collection_name:
+            return
+        replacement = _build_retriever(
+            self.settings, self.qdrant_client, self.embedder, self.scorer, chunks, collection
+        )
+        previous = self.collection_name
+        self.service.retriever = replacement
+        self.collection_name = collection
+        # These are this process's generated serving indexes; evaluation indexes are untouched.
+        try:
+            self.qdrant_client.delete_collection(previous)
+        except Exception:
+            logger.warning("A superseded serving index could not be removed", exc_info=True)
 
     def close(self) -> None:
         self.qdrant_client.close()
 
 
-def build_rag_runtime(settings: Settings, project_root: Path = PROJECT_ROOT) -> RAGRuntime:
+def build_rag_runtime(
+    settings: Settings,
+    project_root: Path = PROJECT_ROOT,
+    *,
+    chunks: list[DocumentChunk] | None = None,
+) -> RAGRuntime:
     """Load pinned local models and compose the production retrieval/generation path."""
 
-    chunks = read_chunks(project_root / "data/processed/chunks_recursive.jsonl")
+    if chunks is None:
+        _, uploaded_chunks = DocumentLibrary(settings, project_root).snapshot()
+        chunks = _base_chunks(settings, project_root) + uploaded_chunks
+    if not chunks:
+        raise ValueError("The knowledge base has no documents yet")
     embedding = SentenceTransformerEmbedder(
         settings.embedding_model_name,
         settings.embedding_model_revision,
@@ -49,31 +136,20 @@ def build_rag_runtime(settings: Settings, project_root: Path = PROJECT_ROOT) -> 
     if not qdrant_path.is_absolute():
         qdrant_path = project_root / qdrant_path
     qdrant_client = QdrantClient(path=str(qdrant_path))
-    dense = QdrantDenseRetriever(
-        embedding,
-        f"{settings.qdrant_collection}_recursive",
-        client=qdrant_client,
-    )
-    if not qdrant_client.collection_exists(dense.collection_name):
-        dense.index(chunks)
-    bm25 = BM25Retriever(chunks)
-    hybrid = HybridRetriever(dense, bm25, settings.retrieval_candidate_k)
-    reranker = CrossEncoderScorer(
-        settings.reranker_model_name,
-        settings.reranker_model_revision,
-        settings.retrieval_device,
-    )
-    retriever = RerankedRetriever(
-        hybrid,
-        reranker,
-        settings.retrieval_candidate_k,
-    )
-
-    language_model = load_runtime(
-        settings.model_name,
-        settings.model_revision,
-        settings.device,
-    )
+    collection = _collection_name(settings, chunks)
+    try:
+        reranker = CrossEncoderScorer(
+            settings.reranker_model_name,
+            settings.reranker_model_revision,
+            settings.retrieval_device,
+        )
+        retriever = _build_retriever(
+            settings, qdrant_client, embedding, reranker, chunks, collection
+        )
+        language_model = load_runtime(settings.model_name, settings.model_revision, settings.device)
+    except Exception:
+        qdrant_client.close()
+        raise
     codec = HuggingFaceTokenCodec(language_model.tokenizer)
     context_builder = ContextBuilder(
         codec,
@@ -100,27 +176,57 @@ def build_rag_runtime(settings: Settings, project_root: Path = PROJECT_ROOT) -> 
             minimum_score=settings.rag_extractive_fallback_score,
         ),
     )
-    return RAGRuntime(service=service, qdrant_client=qdrant_client)
+    return RAGRuntime(
+        service=service,
+        qdrant_client=qdrant_client,
+        embedder=embedding,
+        scorer=reranker,
+        settings=settings,
+        collection_name=collection,
+    )
 
 
 class LazyRAGService:
     """Delay expensive model loading until the first API request."""
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        document_library: DocumentLibrary | None = None,
+        project_root: Path = PROJECT_ROOT,
+    ) -> None:
         self.settings = settings
+        self.project_root = project_root
+        self.document_library = document_library or DocumentLibrary(settings, project_root)
+        self._base: list[DocumentChunk] | None = None
+        self._document_revision: str | None = None
         self._runtime: RAGRuntime | None = None
         self._lock = Lock()
 
     def _get_runtime(self) -> RAGRuntime:
+        """Caller holds the lock so generation, refresh, and shutdown cannot race."""
+
+        revision, uploaded = self.document_library.snapshot()
+        if self._base is None:
+            self._base = _base_chunks(self.settings, self.project_root)
         if self._runtime is None:
-            with self._lock:
-                if self._runtime is None:
-                    self._runtime = build_rag_runtime(self.settings)
+            self._runtime = build_rag_runtime(
+                self.settings, self.project_root, chunks=self._base + uploaded
+            )
+            self._document_revision = revision
+        elif revision != self._document_revision:
+            self._runtime.refresh(self._base + uploaded)
+            self._document_revision = revision
         return self._runtime
 
     def answer(self, question: str, top_k: int | None = None) -> RAGAnswer:
-        return self._get_runtime().service.answer(question, top_k)
+        with self._lock:
+            return self._get_runtime().service.answer(question, top_k)
 
     def close(self) -> None:
-        if self._runtime is not None:
-            self._runtime.close()
+        with self._lock:
+            if self._runtime is not None:
+                self._runtime.close()
+                self._runtime = None
+                self._document_revision = None

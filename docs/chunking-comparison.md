@@ -1,5 +1,9 @@
 # Chunking Comparison
 
+Historical artifact: `Recall@5` below is the earlier Hit Rate definition. See
+[Stage 24](chunking-benchmark.md) for the expanded parameter grid with conventional
+Recall and separate Hit Rate measurements.
+
 Both strategies use 160 tokenizer tokens with
 30 tokens of overlap. Fixed chunking slices token windows;
 recursive chunking first preserves Markdown blocks and sentence boundaries, then falls

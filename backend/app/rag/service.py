@@ -72,7 +72,13 @@ class RAGService:
         self.minimum_retrieval_score = minimum_retrieval_score
         self.extractive_fallback = extractive_fallback
 
-    def _empty_answer(self, question: str, retrieval_ms: float, total_ms: float) -> RAGAnswer:
+    def _empty_answer(
+        self,
+        question: str,
+        retrieval_ms: float,
+        total_ms: float,
+        context_ms: float = 0.0,
+    ) -> RAGAnswer:
         return RAGAnswer(
             question=question,
             status="abstained",
@@ -85,7 +91,9 @@ class RAGService:
             context_token_count=0,
             timings=RAGTiming(
                 retrieval_ms=round(retrieval_ms, 6),
+                context_ms=round(context_ms, 6),
                 generation_ms=0.0,
+                grounding_ms=0.0,
                 total_ms=round(total_ms, 6),
             ),
             input_tokens=0,
@@ -111,13 +119,16 @@ class RAGService:
         ):
             total_ms = (perf_counter() - total_started) * 1_000
             return self._empty_answer(normalized_question, retrieval_ms, total_ms)
+        context_started = perf_counter()
         context = self.context_builder.build(normalized_question, results)
+        context_ms = (perf_counter() - context_started) * 1_000
         if not context.sources:
             total_ms = (perf_counter() - total_started) * 1_000
-            return self._empty_answer(normalized_question, retrieval_ms, total_ms)
+            return self._empty_answer(normalized_question, retrieval_ms, total_ms, context_ms)
 
         prompt = build_grounded_prompt(normalized_question, context)
         generation = self.generator.generate(prompt, GROUNDED_SYSTEM_PROMPT)
+        grounding_started = perf_counter()
         raw_answer = generation.text.strip()
         validation = validate_citations(raw_answer, context)
         source_by_id = {source.citation_id: source for source in context.sources}
@@ -163,6 +174,7 @@ class RAGService:
                 if source_id in source_by_id
             ]
 
+        grounding_ms = (perf_counter() - grounding_started) * 1_000
         total_ms = (perf_counter() - total_started) * 1_000
         return RAGAnswer(
             question=normalized_question,
@@ -176,7 +188,9 @@ class RAGService:
             context_token_count=context.token_count,
             timings=RAGTiming(
                 retrieval_ms=round(retrieval_ms, 6),
+                context_ms=round(context_ms, 6),
                 generation_ms=round(generation.generation_seconds * 1_000, 6),
+                grounding_ms=round(grounding_ms, 6),
                 total_ms=round(total_ms, 6),
             ),
             input_tokens=generation.input_tokens,

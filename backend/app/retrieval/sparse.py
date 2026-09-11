@@ -26,11 +26,16 @@ class BM25Retriever:
         if not chunks:
             raise ValueError("BM25 requires at least one chunk")
         self.chunks = chunks
-        self._index = BM25Okapi([tokenize_for_bm25(chunk.text) for chunk in chunks])
+        corpus = [tokenize_for_bm25(chunk.text) for chunk in chunks]
+        # Valid uploads can contain only symbols or non-Latin text. In that case
+        # this English tokenizer has no lexical evidence; dense retrieval still works.
+        self._index = BM25Okapi(corpus) if any(corpus) else None
 
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
         """Return highest-scoring chunks with stable tie-breaking."""
 
+        if self._index is None:
+            return []
         scores = np.asarray(self._index.get_scores(tokenize_for_bm25(query)), dtype=float)
         order = sorted(range(len(self.chunks)), key=lambda index: (-scores[index], index))
         results: list[RetrievalResult] = []

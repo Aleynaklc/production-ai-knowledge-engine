@@ -7,7 +7,8 @@ measurable and inspectable.
 The project is being developed in tested stages. The current foundation includes
 transparent attention and tokenization experiments, configurable local Hugging Face
 inference, a measured dense/sparse/hybrid retrieval system, and grounded local answer
-generation. Later stages add the interactive frontend and production operations.
+generation, an interactive frontend, and reproducible quality/performance benchmarks.
+Later stages add production operations.
 
 ## Current capabilities
 
@@ -30,7 +31,16 @@ generation. Later stages add the interactive frontend and production operations.
 - A versioned 30-query relevance set with Recall, Precision, MRR, NDCG, and latency
 - Token-budgeted grounded generation with source citations and safe abstention
 - Citation validation that suppresses invented sources and uncited factual claims
-- Lazy local RAG API at `POST /rag/answer`
+- Versioned FastAPI surface with stable errors, request correlation, and local-browser CORS
+- Bounded four-stage system traces with timings, tokens, validation, and source lineage
+- Responsive React Frontend V1 for grounded answers, evidence cards, and trace inspection
+- Browser document uploads with UTF-8 Markdown/text validation, persistent storage,
+  duplicate detection, and automatic retrieval refresh
+- Backwards-compatible local RAG API at `POST /rag/answer`
+- Pinned embedding model and batch-size comparisons with retrieval quality and encoding cost
+- Fixed/recursive chunking parameter sweeps with freshly resolved source labels
+- Repeated RAG evaluation with citation, abstention, lexical answer checks, and phase timings
+- Generation latency distributions across prompt lengths and output caps
 
 ## Prerequisites
 
@@ -58,7 +68,44 @@ uv run uvicorn backend.app.main:app --reload
 Then inspect:
 
 - Health: <http://127.0.0.1:8000/health>
+- Versioned health: <http://127.0.0.1:8000/api/v1/health>
 - OpenAPI UI: <http://127.0.0.1:8000/docs>
+
+Run Frontend V1 in a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open <http://localhost:3000>. The local API and frontend do not require an external AI API key.
+
+### Upload documents
+
+Use **Upload a document** in the console to choose a UTF-8 `.md` or `.txt` file.
+The API validates and chunks it, saves it in the document library, and includes it in
+retrieval before the next answer. The library is shared by everyone who can access this
+API; uploads are not private to a user. Uploaded documents appear alongside the bundled
+NovaStack knowledge base in retrieval and citations.
+
+The default limit is 5 MiB per file, 100 documents, and 2,000 uploaded chunks in total.
+Identical file contents return the existing document instead of creating a duplicate.
+Documents and chunks persist across restarts in `data/uploads/documents.sqlite3`.
+Chunking uses `PAKE_CHUNK_STRATEGY` (`recursive` by default), with 160 tokens per chunk
+and 30 tokens of overlap; changing these settings affects subsequent uploads.
+
+The same workflow is available directly through the API:
+
+```bash
+curl -X POST 'http://127.0.0.1:8000/api/v1/documents?filename=guide.md' \
+  -H 'Content-Type: application/octet-stream' \
+  --data-binary @guide.md
+curl 'http://127.0.0.1:8000/api/v1/documents'
+```
+
+The upload body contains the raw file bytes. See the [API contract](docs/api-system-trace-and-frontend.md)
+for responses and validation errors. PDF and Word files are not supported by this uploader.
 
 ## Quality checks
 
@@ -155,8 +202,47 @@ uv run python -m scripts.evaluate_rag
 ```
 
 The same pipeline is available at `POST /rag/answer`. Models are loaded lazily on the
-first RAG request. See the [Grounded RAG design](docs/grounded-rag.md) and generated
-[Grounded RAG evaluation](docs/grounded-rag-evaluation.md).
+first RAG request. See the [Grounded RAG design](docs/grounded-rag.md) and current
+[RAG evaluation](docs/rag-evaluation.md). The earlier
+[Stage 13–16 report](docs/grounded-rag-evaluation.md) is retained as historical evidence.
+
+## Evaluation and performance — Stages 23–26
+
+Run the four benchmarks from the repository root. Each command writes real local model
+measurements to JSON and a readable Markdown report. They use isolated evaluation indexes;
+the serving Qdrant collection is not changed. First runs download any missing pinned models.
+
+```bash
+# Stage 23: MiniLM L6/L12, batch sizes 8/32, identical corpus and labels
+uv run python -m scripts.benchmark_embeddings --device cpu
+
+# Stage 24: fixed/recursive × 80/160/240 tokens × 0/30 overlap
+uv run python -m scripts.benchmark_chunking --device cpu
+
+# Stage 25: end-to-end answers, citations, abstention, and stage timings
+uv run python -m scripts.evaluate_rag --device cpu --retrieval-device cpu
+
+# Stage 26: short/medium/long prompts × 32/64 output-token caps
+uv run python -m scripts.benchmark_generation --device cpu
+```
+
+Use `--help` for custom repeats, warmups, input datasets, and output destinations. Set
+`HF_HUB_OFFLINE=1` to use cached models without network access. Run benchmarks sequentially
+on an otherwise idle machine; overlapping inference jobs distort latency comparisons.
+
+| Stage | Report | Machine-readable evidence |
+|---|---|---|
+| 23 | [Embedding Benchmark](docs/embedding-benchmark.md) | [JSON](evaluation/reports/embedding_benchmark.json) |
+| 24 | [Chunking Benchmark](docs/chunking-benchmark.md) | [JSON](evaluation/reports/chunking_benchmark_v1.json) |
+| 25 | [RAG Evaluation](docs/rag-evaluation.md) | [JSON](evaluation/reports/rag_evaluation_v1.json) |
+| 26 | [Generation Latency Benchmark](docs/generation-latency-benchmark.md), [measured results](evaluation/reports/generation_latency.md) | [JSON](evaluation/reports/generation_latency.json) |
+
+Stage 23–24 report conventional Recall (fraction of relevant labeled chunks found) and
+Hit Rate (any relevant hit) separately. The old schema-v1 retrieval artifact called Hit
+Rate “Recall”; it is kept as historical evidence. RAG correctness is an accepted-answer
+lexical proxy, and the grounding gate is not an independent semantic judge. Generation
+throughput includes prefill and decoding; TTFT is explicitly unavailable. Model/data
+fingerprints, timing boundaries, raw trials, and limitations are included in the reports.
 
 ## Configuration
 
@@ -173,6 +259,7 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_MODEL_REVISION` | pinned commit | Immutable model revision |
 | `PAKE_DEVICE` | `auto` | `auto`, `cpu`, `mps`, or `cuda` |
 | `PAKE_MAX_NEW_TOKENS` | `128` | Default generation limit |
+| `PAKE_CHUNK_STRATEGY` | `recursive` | Uploaded-document chunking strategy: `fixed` or `recursive` |
 | `PAKE_CHUNK_SIZE_TOKENS` | `160` | Maximum chunk token count |
 | `PAKE_CHUNK_OVERLAP_TOKENS` | `30` | Token overlap between chunks |
 | `PAKE_EMBEDDING_MODEL_NAME` | `sentence-transformers/all-MiniLM-L6-v2` | Dense embedding model |
@@ -187,6 +274,12 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_RAG_STRICT_GROUNDING` | `true` | Suppress answers that fail citation validation |
 | `PAKE_RAG_MIN_RETRIEVAL_SCORE` | `0.8` | Cross-encoder confidence floor for generation |
 | `PAKE_RAG_EXTRACTIVE_FALLBACK_SCORE` | `1.0` | Minimum score for cited extractive fallback |
+| `PAKE_API_CORS_ORIGINS` | local ports 3000 and 5173 | Comma-separated allowed browser origins |
+| `PAKE_TRACE_MAX_RECORDS` | `200` | Maximum recent in-process system traces |
+| `PAKE_DOCUMENTS_PATH` | `data/uploads/documents.sqlite3` | Persistent uploaded documents and chunks |
+| `PAKE_UPLOAD_MAX_BYTES` | `5242880` | Maximum bytes per uploaded file |
+| `PAKE_UPLOAD_MAX_DOCUMENTS` | `100` | Maximum documents in the shared upload library |
+| `PAKE_UPLOAD_MAX_CHUNKS` | `2000` | Maximum uploaded chunks across the library |
 
 ## Repository structure
 
@@ -194,20 +287,24 @@ Git; only placeholder values belong in `.env.example`.
 backend/
   app/
     config.py       # Typed environment configuration
+    documents/      # Validated uploads, duplicate detection, and SQLite document library
+    observability/  # Structured system traces and bounded in-process storage
     embeddings/     # Sentence embedding boundary and implementation
-    evaluation/     # Versioned query labels and ranking metrics
+    evaluation/     # Query labels, quality metrics, and performance benchmarks
     ingestion/      # Loaders, cleaning, token chunking, and persistence
     main.py         # FastAPI application and health endpoint
     llm/            # Model loading, prompt construction, and generation
     rag/            # Context budgeting, grounded prompts, citations, and answer service
     retrieval/      # Qdrant, BM25, RRF, hybrid search, and reranking
 data/raw/           # Versioned NovaStack demonstration knowledge base
+data/uploads/       # Persistent uploaded documents and chunks (ignored by Git)
 data/evaluation/    # Human-reviewable and resolved retrieval relevance labels
 scripts/            # Reproducible CLI and experiment runners
 docs/               # Decisions and measured engineering reports
 evaluation/reports/ # Machine-readable experiment evidence
 tests/              # Backend tests
 notebooks/          # Executable AI/LLM learning experiments
+frontend/           # React knowledge console and system trace UI
 .github/workflows/  # Continuous integration
 ```
 

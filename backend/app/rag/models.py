@@ -24,12 +24,14 @@ class AnswerCitation(BaseModel):
 
 
 class RAGTiming(BaseModel):
-    """Wall-clock timings for the two expensive RAG phases."""
+    """Wall-clock timings for each visible RAG phase."""
 
     model_config = ConfigDict(frozen=True)
 
     retrieval_ms: float = Field(ge=0)
+    context_ms: float = Field(ge=0)
     generation_ms: float = Field(ge=0)
+    grounding_ms: float = Field(ge=0)
     total_ms: float = Field(ge=0)
 
 

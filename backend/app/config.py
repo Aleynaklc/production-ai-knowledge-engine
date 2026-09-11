@@ -41,6 +41,20 @@ class Settings(BaseSettings):
     rag_strict_grounding: bool = True
     rag_min_retrieval_score: float = 0.8
     rag_extractive_fallback_score: float = 1.0
+    api_cors_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
+    )
+    trace_max_records: int = Field(default=200, ge=1, le=10_000)
+    documents_path: Path = Path("data/uploads/documents.sqlite3")
+    upload_max_bytes: int = Field(default=5 * 1024 * 1024, ge=1, le=50 * 1024 * 1024)
+    upload_max_documents: int = Field(default=100, ge=1, le=10_000)
+    upload_max_chunks: int = Field(default=2_000, ge=1, le=100_000)
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Return normalized browser origins accepted by the API."""
+
+        return [origin.strip() for origin in self.api_cors_origins.split(",") if origin.strip()]
 
     model_config = SettingsConfigDict(
         env_file=".env",
