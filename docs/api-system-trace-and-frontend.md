@@ -11,7 +11,7 @@ compatibility. New clients should use the versioned surface:
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/api/v1/health` | Readiness and API version without loading models |
+| `GET` | `/api/v1/health` | Process health and API version without loading models |
 | `GET` | `/api/v1/system` | Safe runtime capabilities for the frontend |
 | `GET` | `/api/v1/documents` | Uploaded documents, supported extensions, and file-size limit |
 | `POST` | `/api/v1/documents?filename=guide.md` | Validate, chunk, and persist raw file bytes |
@@ -23,9 +23,15 @@ Every response includes `X-Request-ID`. Successful answer responses include the 
 `request_id`, a unique `trace_id`, the grounded `result`, and the trace snapshot. Validation,
 bad-request, and trace-not-found failures use a stable `{ "error": { ... } }` envelope and do
 not expose internal exception details.
+Whitespace-only questions fail validation before loading models. Model, inference, and
+index failures return HTTP 503 with `rag_unavailable`; document-storage failures also
+return HTTP 503. Failed requests do not create successful execution traces.
 
 Browser origins are configured with the comma-separated `PAKE_API_CORS_ORIGINS` setting.
 Defaults allow the local frontend development ports 3000 and 5173 only.
+Health responses confirm that the API process is running; they do not establish that
+model loading or the first answer will succeed. Deployment checks should include a real
+upload and answer request.
 
 ## Document upload contract
 
@@ -84,8 +90,10 @@ The record includes measured stage and total latency, source lineage for returne
 context/input/output token counts, validation issues, fallback use, and the final safety status.
 Traces are stored in a thread-safe in-process store. The newest 200 records are retained by
 default (`PAKE_TRACE_MAX_RECORDS`); the oldest record is evicted when the bound is reached.
-The store deliberately contains no prompts, model weights, secrets, or hidden chain-of-thought.
-Restarting the API clears the store.
+The store contains the submitted question, source metadata, and diagnostics; it does not
+contain the full assembled model prompt, model weights, or hidden chain-of-thought.
+Trace routes share the API's unauthenticated access, so restrict access to the service
+before using confidential questions or documents. Restarting the API clears the store.
 
 ## Frontend V1
 
@@ -125,6 +133,7 @@ uv run mypy
 uv run pytest
 cd frontend
 npm run lint
+npm run typecheck
 npm run build
 ```
 

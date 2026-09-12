@@ -11,7 +11,8 @@ external AI API key.
 2. The context builder deduplicates passages, assigns stable `[S1]`, `[S2]` identifiers,
    and enforces the configured tokenizer budget.
 3. Source text is escaped and wrapped in explicit source blocks. The system prompt treats
-   it as untrusted data, preventing instructions in documents from overriding RAG rules.
+   it as untrusted data to reduce the risk of document instructions overriding RAG rules.
+   This prompting boundary is not a guarantee against prompt injection.
 4. The pinned local Qwen model generates with greedy decoding and must cite every factual
    sentence.
 5. The grounding gate parses citations, checks that every identifier exists, and rejects
@@ -26,8 +27,9 @@ Strict validation has three public states:
 - `abstained`: no answer was claimed because evidence was insufficient.
 - `rejected`: the model produced an answer, but the grounding gate suppressed it.
 
-Rejected responses retain `raw_answer` and validation issues for offline diagnostics; the
-caller receives the safe insufficient-context message.
+Rejected API responses retain `raw_answer` and validation issues for diagnostics; the
+user-facing `answer` field contains the insufficient-context message. The lexical gate
+recognizes Unicode words but is not an independent semantic correctness judge.
 
 ## Run locally
 
@@ -56,5 +58,6 @@ uv run python -m scripts.evaluate_rag
 
 The benchmark covers answer content, citation precision/recall, grounding validity,
 abstention on unanswerable questions, rejection behavior, and end-to-end latency. Results
-are written to `evaluation/reports/grounded_rag_v1.json` and
-`docs/grounded-rag-evaluation.md`.
+are now written to `evaluation/reports/rag_evaluation_v1.json` and
+`docs/rag-evaluation.md`. The earlier `grounded_rag_v1.json` and
+`grounded-rag-evaluation.md` files are retained as historical Stage 13–16 evidence.

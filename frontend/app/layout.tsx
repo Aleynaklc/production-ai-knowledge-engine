@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'NovaStack Knowledge Console',
   description:
     'A transparent interface for grounded local knowledge retrieval.',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default function RootLayout({

@@ -69,6 +69,8 @@ class QdrantDenseRetriever:
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
         """Embed a query and return Qdrant cosine matches."""
 
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
         response = self.client.query_points(
             collection_name=self.collection_name,
             query=self.embedder.embed_query(query),

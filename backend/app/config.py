@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     upload_max_bytes: int = Field(default=5 * 1024 * 1024, ge=1, le=50 * 1024 * 1024)
     upload_max_documents: int = Field(default=100, ge=1, le=10_000)
     upload_max_chunks: int = Field(default=2_000, ge=1, le=100_000)
+
+    @model_validator(mode="after")
+    def validate_chunk_window(self) -> "Settings":
+        if self.chunk_overlap_tokens >= self.chunk_size_tokens:
+            raise ValueError("chunk_overlap_tokens must be smaller than chunk_size_tokens")
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

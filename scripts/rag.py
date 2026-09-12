@@ -15,7 +15,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
-    args = build_parser().parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
+    if not args.question.strip() or (args.top_k is not None and args.top_k < 1):
+        parser.error("question must contain text and top-k must be positive")
     runtime = build_rag_runtime(Settings())
     try:
         answer = runtime.service.answer(args.question, args.top_k)

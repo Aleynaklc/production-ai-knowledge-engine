@@ -2,16 +2,20 @@
 
 from pathlib import Path
 
+import pytest
 from qdrant_client import QdrantClient
 
+from backend.app.config import Settings
 from backend.app.evaluation.dataset import RetrievalEvaluationQuery
 from backend.app.evaluation.metrics import evaluate_retriever
 from backend.app.ingestion.models import DocumentChunk
+from backend.app.ingestion.pipeline import write_chunks
 from backend.app.retrieval.dense import QdrantDenseRetriever
 from backend.app.retrieval.fusion import reciprocal_rank_fusion
 from backend.app.retrieval.models import RetrievalResult
 from backend.app.retrieval.reranker import RerankedRetriever
 from backend.app.retrieval.sparse import BM25Retriever
+from scripts import search
 
 
 def make_chunk(index: int, text: str) -> DocumentChunk:
@@ -106,6 +110,23 @@ def test_reranker_reorders_candidate_passages() -> None:
     assert "reranker" in results[0].component_scores
 
 
+def test_empty_candidates_do_not_reach_cross_encoder() -> None:
+    class UnusedScorer:
+        def score(self, query: str, passages: list[str]) -> list[float]:
+            raise AssertionError("An empty candidate list must not reach the model")
+
+    assert RerankedRetriever(StaticRetriever([]), UnusedScorer()).retrieve("query") == []
+
+
+def test_rrf_does_not_reward_duplicates_from_one_retriever() -> None:
+    one = make_chunk(1, "one")
+    results = reciprocal_rank_fusion(
+        [[ranked(one, 1, "dense"), ranked(one, 2, "dense")], [ranked(one, 1, "bm25")]],
+        top_k=1,
+    )
+    assert results[0].score == pytest.approx(2 / 61)
+
+
 def test_metrics_calculate_hit_precision_and_reciprocal_rank() -> None:
     first = make_chunk(1, "first")
     relevant = make_chunk(2, "relevant")
@@ -137,3 +158,22 @@ def test_qdrant_local_dense_index_round_trip(tmp_path: Path) -> None:
 
     assert results[0].chunk.chunk_id == chunks[0].chunk_id
     assert results[0].chunk.source == "doc-1.md"
+
+
+def test_search_cli_reindexes_updated_chunks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    settings = Settings(qdrant_path=tmp_path / "qdrant")
+    monkeypatch.setattr(search, "Settings", lambda: settings)
+    monkeypatch.setattr(search, "PROJECT_ROOT", tmp_path)
+    monkeypatch.setattr(search, "SentenceTransformerEmbedder", lambda *args: KeywordEmbedder())
+    monkeypatch.setattr("sys.argv", ["search", "alpha", "--method", "dense"])
+    path = tmp_path / "data/processed/chunks_recursive.jsonl"
+    write_chunks(path, [make_chunk(1, "alpha original policy")])
+    search.main()
+    capsys.readouterr()
+    write_chunks(path, [make_chunk(1, "alpha updated policy")])
+    search.main()
+    result = capsys.readouterr().out
+    assert "updated policy" in result
+    assert "original policy" not in result

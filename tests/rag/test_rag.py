@@ -2,6 +2,7 @@
 
 import re
 
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.config import Settings
@@ -147,6 +148,33 @@ def test_citation_validator_rejects_empty_and_unsupported_cited_claims() -> None
 
     assert "answer_has_no_substantive_claims" in empty.issues
     assert "answer_has_unsupported_claims" in unsupported.issues
+
+
+def test_citation_validator_does_not_ignore_uncited_non_latin_claims() -> None:
+    context = ContextBuilder(WordCodec(), token_budget=100).build(
+        "question", [make_result(1, "Access tokens expire after 15 minutes.")]
+    )
+    result = validate_citations(
+        "[S1] Access tokens expire after 15 minutes.\n未经核实的承诺。", context
+    )
+    assert not result.valid
+    assert "answer_has_uncited_claims" in result.issues
+
+
+@pytest.mark.parametrize("text", ["İzin süresi beş dakikadır.", "日本語の案内文。"])
+def test_citation_validator_recognizes_cited_unicode_text(text: str) -> None:
+    context = ContextBuilder(WordCodec(), token_budget=100).build(
+        "question", [make_result(1, text)]
+    )
+    assert validate_citations(f"[S1] {text}", context).valid
+
+
+def test_zero_retrieval_depth_is_not_silently_replaced_with_default() -> None:
+    generator = FakeGenerator("unused")
+    service = RAGService(StaticRetriever([]), ContextBuilder(WordCodec()), generator)
+    with pytest.raises(ValueError, match="positive"):
+        service.answer("question", top_k=0)
+    assert generator.calls == 0
 
 
 def test_service_returns_grounded_answer_with_source_lineage() -> None:

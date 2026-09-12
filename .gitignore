@@ -27,6 +27,9 @@ venv/
 .idea/
 .vscode/
 
+# Personal work kept locally, outside the application source
+/github-profile-draft/
+
 # Local data and model artifacts
 data/processed/*
 data/qdrant/

@@ -106,7 +106,7 @@ class RAGService:
         normalized_question = question.strip()
         if not normalized_question:
             raise ValueError("Question cannot be empty")
-        retrieval_depth = top_k or self.default_top_k
+        retrieval_depth = self.default_top_k if top_k is None else top_k
         if retrieval_depth < 1:
             raise ValueError("top_k must be positive")
 

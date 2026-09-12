@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.config import Settings
@@ -156,3 +157,45 @@ def test_trace_store_is_bounded_and_newest_first() -> None:
 
     assert store.get("one") is None
     assert [trace.trace_id for trace in store.recent()] == ["three", "two"]
+
+
+def test_empty_injected_trace_store_retains_its_identity_and_capacity() -> None:
+    store = TraceStore(max_records=1)
+    app = create_app(rag_service=FakeAnswerService(), trace_store=store)
+    assert app.state.trace_store is store
+    with TestClient(app) as client:
+        for question in ("first", "second"):
+            assert client.post("/api/v1/answers", json={"question": question}).status_code == 200
+    assert len(store) == 1
+    assert store.recent()[0].question == "second"
+
+
+@pytest.mark.parametrize("route", ["/api/v1/answers", "/rag/answer"])
+def test_runtime_failure_returns_safe_correlated_error_and_can_recover(route: str) -> None:
+    class FailingService(FakeAnswerService):
+        failed = False
+
+        def answer(self, question: str, top_k: int | None = None) -> RAGAnswer:
+            if not self.failed:
+                self.failed = True
+                raise RuntimeError("private model path /secret/model unavailable")
+            return super().answer(question, top_k)
+
+    store = TraceStore()
+    with TestClient(create_app(rag_service=FailingService(), trace_store=store)) as client:
+        failed = client.post(route, json={"question": "A valid question"})
+        assert failed.status_code == 503
+        assert failed.json()["error"]["code"] == "rag_unavailable"
+        assert failed.json()["error"]["request_id"] == failed.headers["x-request-id"]
+        assert "/secret" not in failed.text
+        assert len(store) == 0
+        assert client.post(route, json={"question": "Retry question"}).status_code == 200
+        assert len(store) == 1
+
+
+@pytest.mark.parametrize("route", ["/api/v1/answers", "/rag/answer"])
+def test_whitespace_question_is_rejected_before_model_work(route: str) -> None:
+    with TestClient(create_app()) as client:
+        response = client.post(route, json={"question": " \n\t "})
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "request_validation_failed"

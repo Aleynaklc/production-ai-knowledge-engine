@@ -50,9 +50,12 @@ def _print_results(retriever: Retriever, query: str, top_k: int) -> None:
 
 
 def main() -> None:
-    args = build_parser().parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
     settings = Settings()
-    top_k = args.top_k or settings.retrieval_top_k
+    top_k = settings.retrieval_top_k if args.top_k is None else args.top_k
+    if top_k < 1 or not args.query.strip():
+        parser.error("query must contain text and top-k must be positive")
     chunks = read_chunks(PROJECT_ROOT / "data/processed/chunks_recursive.jsonl")
     bm25 = BM25Retriever(chunks)
     if args.method == "bm25":
@@ -74,8 +77,9 @@ def main() -> None:
             f"{settings.qdrant_collection}_recursive",
             client=client,
         )
-        if not client.collection_exists(dense.collection_name):
-            dense.index(chunks)
+        # A previous CLI/evaluation run may have indexed different chunks or a
+        # different embedding model. Rebuild from the current input on each run.
+        dense.index(chunks)
         if args.method == "dense":
             retriever: Retriever = dense
         else:

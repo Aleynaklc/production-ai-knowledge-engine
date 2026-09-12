@@ -34,6 +34,8 @@ class BM25Retriever:
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
         """Return highest-scoring chunks with stable tie-breaking."""
 
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
         if self._index is None:
             return []
         scores = np.asarray(self._index.get_scores(tokenize_for_bm25(query)), dtype=float)

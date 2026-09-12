@@ -9,6 +9,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from threading import Lock
 
+from pydantic import ValidationError
+
 from backend.app.config import Settings
 from backend.app.documents.models import DocumentRecord, UploadResult
 from backend.app.ingestion.chunkers import (
@@ -137,7 +139,7 @@ class DocumentLibrary:
         try:
             with closing(self._connect_readonly()) as connection:
                 return self._read_records(connection)
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, sqlite3.Error, ValidationError) as error:
             raise DocumentUploadError(
                 "storage_unavailable", "Document storage is temporarily unavailable.", 503
             ) from error
@@ -162,7 +164,7 @@ class DocumentLibrary:
                     fingerprint.update(b"\n")
                     chunks.append(DocumentChunk.model_validate_json(row[0]))
                 return fingerprint.hexdigest(), chunks
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, sqlite3.Error, ValidationError) as error:
             raise DocumentUploadError(
                 "storage_unavailable", "Document storage is temporarily unavailable.", 503
             ) from error
@@ -298,7 +300,7 @@ class DocumentLibrary:
                     [(record.id, chunk.chunk_index, chunk.model_dump_json()) for chunk in chunks],
                 )
             return UploadResult(document=record, duplicate=False)
-        except (OSError, sqlite3.Error) as error:
+        except (OSError, sqlite3.Error, ValidationError) as error:
             raise DocumentUploadError(
                 "storage_unavailable", "Document storage is temporarily unavailable.", 503
             ) from error

@@ -37,6 +37,8 @@ class CrossEncoderScorer:
     def score(self, query: str, passages: list[str]) -> list[float]:
         """Score query-passage pairs as a batch."""
 
+        if not passages:
+            return []
         pairs = [(query, passage) for passage in passages]
         values = self._model.predict(pairs, show_progress_bar=False)
         return cast(list[float], np.asarray(values, dtype=float).reshape(-1).tolist())
@@ -57,7 +59,11 @@ class RerankedRetriever:
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
         """Retrieve candidates and replace their order with cross-encoder scores."""
 
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
         candidates = self.base.retrieve(query, self.candidate_k)
+        if not candidates:
+            return []
         scores = self.scorer.score(query, [result.chunk.text for result in candidates])
         if len(scores) != len(candidates):
             raise ValueError("Reranker returned a different number of scores than candidates")

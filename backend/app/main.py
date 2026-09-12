@@ -11,7 +11,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.responses import Response
 
@@ -65,6 +65,14 @@ class RAGRequest(BaseModel):
 
     question: str = Field(min_length=1, max_length=2_000)
     top_k: int | None = Field(default=None, ge=1, le=20)
+
+    @field_validator("question")
+    @classmethod
+    def normalize_question(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Question must contain text")
+        return value
 
 
 class AnswerResponse(BaseModel):
@@ -130,13 +138,17 @@ def create_app(
     service_provider: AnswerService = rag_service or LazyRAGService(
         runtime_settings, document_library=library
     )
-    runtime_trace_store = trace_store or TraceStore(runtime_settings.trace_max_records)
+    runtime_trace_store = (
+        trace_store if trace_store is not None else TraceStore(runtime_settings.trace_max_records)
+    )
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-        yield
-        if isinstance(service_provider, LazyRAGService):
-            await run_in_threadpool(service_provider.close)
+        try:
+            yield
+        finally:
+            if isinstance(service_provider, LazyRAGService):
+                await run_in_threadpool(service_provider.close)
 
     application = FastAPI(
         title=runtime_settings.app_name,
@@ -300,9 +312,20 @@ def create_app(
             api_version=API_VERSION,
         )
 
-    async def execute_answer(request: Request, payload: RAGRequest) -> AnswerResponse:
+    async def execute_answer(request: Request, payload: RAGRequest) -> AnswerResponse | Response:
         service: AnswerService = application.state.rag_service
-        result = await run_in_threadpool(service.answer, payload.question, payload.top_k)
+        try:
+            result = await run_in_threadpool(service.answer, payload.question, payload.top_k)
+        except DocumentUploadError:
+            raise
+        except Exception:
+            logger.exception("RAG request failed")
+            return _error(
+                503,
+                "rag_unavailable",
+                "The answer service is temporarily unavailable. Please retry.",
+                _request_id(request),
+            )
         request_id = _request_id(request)
         trace = build_system_trace(result, request_id)
         store: TraceStore = application.state.trace_store
@@ -349,19 +372,32 @@ def create_app(
     @application.post(
         f"{API_PREFIX}/answers",
         response_model=AnswerResponse,
-        responses={400: {"model": ErrorResponse}, 422: {"model": ErrorResponse}},
+        responses={
+            400: {"model": ErrorResponse},
+            422: {"model": ErrorResponse},
+            503: {"model": ErrorResponse},
+        },
         tags=["answers"],
     )
-    async def answer_question_v1(request: Request, payload: RAGRequest) -> AnswerResponse:
+    async def answer_question_v1(
+        request: Request, payload: RAGRequest
+    ) -> AnswerResponse | Response:
         """Retrieve, generate, ground, trace, and return one answer."""
 
         return await execute_answer(request, payload)
 
-    @application.post("/rag/answer", response_model=RAGAnswer, tags=["compatibility"])
-    async def answer_question_legacy(request: Request, payload: RAGRequest) -> RAGAnswer:
+    @application.post(
+        "/rag/answer",
+        response_model=RAGAnswer,
+        responses={503: {"model": ErrorResponse}},
+        tags=["compatibility"],
+    )
+    async def answer_question_legacy(request: Request, payload: RAGRequest) -> RAGAnswer | Response:
         """Keep the Stage 16 answer contract while recording a Stage 19 trace."""
 
         response = await execute_answer(request, payload)
+        if isinstance(response, Response):
+            return response
         return response.result
 
     @application.get(

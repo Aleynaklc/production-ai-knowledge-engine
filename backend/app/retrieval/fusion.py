@@ -22,8 +22,12 @@ def reciprocal_rank_fusion(
     chunks: dict[str, RetrievalResult] = {}
     components: dict[str, dict[str, float]] = {}
     for ranked in ranked_lists:
+        seen: set[str] = set()
         for result in ranked:
             chunk_id = result.chunk.chunk_id
+            if chunk_id in seen:
+                continue
+            seen.add(chunk_id)
             scores[chunk_id] = scores.get(chunk_id, 0.0) + 1.0 / (rank_constant + result.rank)
             chunks.setdefault(chunk_id, result)
             values = components.setdefault(chunk_id, {})

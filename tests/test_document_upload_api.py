@@ -2,6 +2,7 @@
 
 import hashlib
 import re
+import sqlite3
 from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
@@ -59,6 +60,32 @@ def _assert_error(response: httpx.Response, status: int, code: str) -> None:
     assert error["code"] == code
     assert error["message"]
     assert error["request_id"] == response.headers["x-request-id"]
+
+
+@pytest.mark.parametrize("corrupt_chunks", [False, True])
+def test_corrupt_persisted_records_return_storage_error(
+    upload_api: tuple[Settings, DocumentLibrary, TestClient], corrupt_chunks: bool
+) -> None:
+    _, library, client = upload_api
+    assert _upload(client, "guide.md", b"# Guide\n\nSupport information.").status_code == 201
+    connection = sqlite3.connect(library.path)
+    try:
+        if corrupt_chunks:
+            connection.execute("UPDATE chunks SET payload = '{}' ")
+        else:
+            connection.execute("UPDATE documents SET record_json = '{}' ")
+        connection.commit()
+    finally:
+        connection.close()
+    response = cast(
+        httpx.Response,
+        client.post("/api/v1/answers", json={"question": "What is in the guide?"}),
+    )
+    _assert_error(response, 503, "storage_unavailable")
+    if not corrupt_chunks:
+        _assert_error(
+            cast(httpx.Response, client.get("/api/v1/documents")), 503, "storage_unavailable"
+        )
 
 
 def test_upload_returns_ready_document_and_retrievable_chunks(

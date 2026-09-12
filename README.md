@@ -14,7 +14,7 @@ Later stages add production operations.
 
 - Typed environment configuration
 - FastAPI application factory
-- Readiness endpoint at `GET /health`
+- Process health endpoint at `GET /health`
 - OpenAPI documentation at `/docs`
 - Automated formatting, linting, type-checking, and tests
 - [Scaled dot-product attention from scratch](notebooks/01_attention_from_scratch.ipynb)
@@ -116,6 +116,15 @@ uv run mypy
 uv run pytest
 ```
 
+The frontend is also checked in GitHub Actions. Run its checks locally with:
+
+```bash
+cd frontend
+npm run lint
+npm run typecheck
+npm run build
+```
+
 To apply formatting locally:
 
 ```bash
@@ -168,6 +177,12 @@ Create both chunking variants and their resolved relevance labels:
 ```bash
 uv run python -m scripts.ingest data/raw
 ```
+
+This command prepares the benchmark corpus and resolves its bundled relevance labels.
+It validates every selected chunking strategy before replacing existing chunk and label
+files. Use the document upload API for additional user documents. The search CLI rebuilds
+its dense collection from the current prepared chunks on each invocation to avoid stale
+results after re-ingestion or an embedding-model change.
 
 Build local Qdrant indexes and run the complete retrieval benchmark:
 
@@ -310,3 +325,6 @@ frontend/           # React knowledge console and system trace UI
 
 Generated chunk files and the local Qdrant database are ignored; rerunning ingestion and
 evaluation recreates them from versioned sources.
+TypeScript build caches and the unrelated local `github-profile-draft/` directory are
+also ignored. Keep notebooks, labeled datasets, lockfiles, and historical benchmark
+reports: they document the staged experiments and make comparisons reproducible.

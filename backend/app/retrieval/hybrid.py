@@ -19,6 +19,8 @@ class HybridRetriever:
     def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
         """Fuse dense and BM25 candidates with RRF."""
 
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
         return reciprocal_rank_fusion(
             [
                 self.dense.retrieve(query, self.candidate_k),

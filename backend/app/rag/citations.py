@@ -9,7 +9,7 @@ from backend.app.rag.prompt import INSUFFICIENT_CONTEXT_RESPONSE
 
 CITATION_PATTERN = re.compile(r"\[S([1-9][0-9]*)\]")
 SENTENCE_PATTERN = re.compile(r"(?<=[.!?])(?:\s+|$)|\n+")
-TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+TOKEN_PATTERN = re.compile(r"[^\W_]+")
 NUMBER_PATTERN = re.compile(r"\b\d+(?::\d+)?\b")
 STOPWORDS = {
     "a",
@@ -62,7 +62,7 @@ def _claims(answer: str) -> list[str]:
     parts = [
         sentence.strip()
         for sentence in SENTENCE_PATTERN.split(answer.strip())
-        if sentence.strip() and re.search(r"[A-Za-z0-9]", sentence)
+        if sentence.strip() and any(character.isalnum() for character in sentence)
     ]
     claims: list[str] = []
     for part in parts:
