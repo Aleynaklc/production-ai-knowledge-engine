@@ -5,6 +5,7 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
+from time import perf_counter
 
 from qdrant_client import QdrantClient
 
@@ -18,10 +19,11 @@ from backend.app.ingestion.parser import load_documents
 from backend.app.ingestion.pipeline import build_chunks, read_chunks
 from backend.app.llm.generation import GenerationOptions
 from backend.app.llm.model import load_runtime
+from backend.app.rag.cache import AnswerCache
 from backend.app.rag.context import ContextBuilder
 from backend.app.rag.fallback import ExtractiveFallback
 from backend.app.rag.generator import LocalGroundedGenerator
-from backend.app.rag.models import RAGAnswer
+from backend.app.rag.models import RAGAnswer, RAGTiming
 from backend.app.rag.service import RAGService
 from backend.app.retrieval.dense import QdrantDenseRetriever
 from backend.app.retrieval.hybrid import HybridRetriever
@@ -187,7 +189,7 @@ def build_rag_runtime(
 
 
 class LazyRAGService:
-    """Delay expensive model loading until the first API request."""
+    """Own reusable models and a corpus-aware cache; prepare eagerly during API startup."""
 
     def __init__(
         self,
@@ -196,13 +198,16 @@ class LazyRAGService:
         document_library: DocumentLibrary | None = None,
         project_root: Path = PROJECT_ROOT,
     ) -> None:
-        self.settings = settings
+        # Runtime settings and the cache share one immutable-by-convention snapshot.
+        # Configuration changes take effect in a new service/process, never a stale cache.
+        self.settings = settings.model_copy(deep=True)
         self.project_root = project_root
         self.document_library = document_library or DocumentLibrary(settings, project_root)
         self._base: list[DocumentChunk] | None = None
         self._document_revision: str | None = None
         self._runtime: RAGRuntime | None = None
         self._lock = Lock()
+        self._cache = AnswerCache(settings.rag_cache_max_entries, settings.rag_cache_ttl_seconds)
 
     def _get_runtime(self) -> RAGRuntime:
         """Caller holds the lock so generation, refresh, and shutdown cannot race."""
@@ -216,16 +221,58 @@ class LazyRAGService:
             )
             self._document_revision = revision
         elif revision != self._document_revision:
+            self._cache.clear()
             self._runtime.refresh(self._base + uploaded)
             self._document_revision = revision
         return self._runtime
 
-    def answer(self, question: str, top_k: int | None = None) -> RAGAnswer:
+    def prepare(self) -> None:
+        """Load all models and build the current index without generating a user answer."""
         with self._lock:
-            return self._get_runtime().service.answer(question, top_k)
+            self._get_runtime()
+
+    def answer(self, question: str, top_k: int | None = None) -> RAGAnswer:
+        started = perf_counter()
+        normalized = question.strip()
+        depth = self.settings.rag_top_k if top_k is None else top_k
+        if not normalized or depth < 1:
+            raise ValueError("Question must not be blank and top_k must be positive")
+        with self._lock:
+            # Always check persistent document revision before consulting the cache.
+            runtime = self._get_runtime()
+            key = (self._document_revision or "", normalized, depth)
+            cached = self._cache.get(key)
+            if cached is not None:
+                return cached.model_copy(
+                    update={
+                        "cache_hit": True,
+                        "input_tokens": 0,
+                        "output_tokens": 0,
+                        "timings": RAGTiming(
+                            retrieval_ms=0,
+                            context_ms=0,
+                            generation_ms=0,
+                            grounding_ms=0,
+                            total_ms=(perf_counter() - started) * 1_000,
+                        ),
+                    }
+                )
+            answer = runtime.service.answer(normalized, depth)
+            answer = answer.model_copy(
+                update={
+                    "timings": answer.timings.model_copy(
+                        update={
+                            "total_ms": (perf_counter() - started) * 1_000,
+                        }
+                    ),
+                }
+            )
+            self._cache.put(key, answer)
+            return answer
 
     def close(self) -> None:
         with self._lock:
+            self._cache.clear()
             if self._runtime is not None:
                 self._runtime.close()
                 self._runtime = None

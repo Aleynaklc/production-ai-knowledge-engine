@@ -195,7 +195,7 @@ def test_runtime_failure_returns_safe_correlated_error_and_can_recover(route: st
 
 @pytest.mark.parametrize("route", ["/api/v1/answers", "/rag/answer"])
 def test_whitespace_question_is_rejected_before_model_work(route: str) -> None:
-    with TestClient(create_app()) as client:
+    with TestClient(create_app(Settings(rag_preload_on_startup=False))) as client:
         response = client.post(route, json={"question": " \n\t "})
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "request_validation_failed"

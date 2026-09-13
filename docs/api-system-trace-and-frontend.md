@@ -23,15 +23,19 @@ Every response includes `X-Request-ID`. Successful answer responses include the 
 `request_id`, a unique `trace_id`, the grounded `result`, and the trace snapshot. Validation,
 bad-request, and trace-not-found failures use a stable `{ "error": { ... } }` envelope and do
 not expose internal exception details.
-Whitespace-only questions fail validation before loading models. Model, inference, and
+Whitespace-only questions fail validation before request-time model work. Model, inference, and
 index failures return HTTP 503 with `rag_unavailable`; document-storage failures also
 return HTTP 503. Failed requests do not create successful execution traces.
 
 Browser origins are configured with the comma-separated `PAKE_API_CORS_ORIGINS` setting.
 Defaults allow the local frontend development ports 3000 and 5173 only.
-Health responses confirm that the API process is running; they do not establish that
-model loading or the first answer will succeed. Deployment checks should include a real
-upload and answer request.
+By default, startup loads all RAG models and prepares the index before the server accepts
+requests (`PAKE_RAG_PRELOAD_ON_STARTUP=true`). A preparation failure aborts startup rather
+than deferring failure to the first user question. Startup may include downloading model
+weights. The flag can be disabled for lightweight development/tests, restoring lazy loading.
+Health responses confirm process health after startup; they do not perform inference or
+guarantee that a subsequent answer will succeed. Deployment checks should include a real
+upload and answer request. Keep one API worker with local Qdrant storage.
 
 ## Document upload contract
 
@@ -88,6 +92,22 @@ Each answer trace records four ordered stages:
 
 The record includes measured stage and total latency, source lineage for returned citations,
 context/input/output token counts, validation issues, fallback use, and the final safety status.
+Answers and traces also expose `cache_hit`. A hit returns the original validated content,
+citations, and validation evidence, with new request and trace IDs. Its four stages are
+marked skipped with zero durations; no model input/output tokens are charged to that request.
+Trace context tokens are also zero; the answer's context count describes the cached evidence.
+`fallback_used` describes the origin of that evidence even on a cache hit. Total latency
+includes service-lock waiting, document revision checks, refresh/loading if needed, and cache
+lookup, but excludes HTTP transport and response serialization. Individual stage timings
+still describe only pipeline work, so their sum may be less than total latency.
+
+The cache holds up to 256 validated answers for 900 seconds, with LRU eviction and a TTL
+that is not extended by hits. `PAKE_RAG_CACHE_MAX_ENTRIES=0` disables it. Rejected/abstained
+answers and exceptions are not cached. Changed uploaded documents invalidate the cache;
+identical uploads preserve it. Restart after changing model/prompt settings or the bundled
+corpus. The cache is process-local and follows the current shared document-library scope;
+future user isolation must scope cache access accordingly.
+
 Traces are stored in a thread-safe in-process store. The newest 200 records are retained by
 default (`PAKE_TRACE_MAX_RECORDS`); the oldest record is evicted when the bound is reached.
 The store contains the submitted question, source metadata, and diagnostics; it does not

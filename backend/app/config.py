@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     rag_strict_grounding: bool = True
     rag_min_retrieval_score: float = 0.8
     rag_extractive_fallback_score: float = 1.0
+    rag_preload_on_startup: bool = True
+    rag_cache_max_entries: int = Field(default=256, ge=0, le=10_000)
+    rag_cache_ttl_seconds: int = Field(default=900, ge=1, le=86_400)
     api_cors_origins: str = (
         "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
     )

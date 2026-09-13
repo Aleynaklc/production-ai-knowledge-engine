@@ -41,6 +41,7 @@ class RAGAnswer(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     question: str
+    cache_hit: bool = False
     status: RAGStatus
     answer: str
     raw_answer: str | None

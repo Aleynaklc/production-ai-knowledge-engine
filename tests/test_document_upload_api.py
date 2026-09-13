@@ -31,6 +31,7 @@ class WordCodec:
 def upload_api(tmp_path: Path) -> Iterator[tuple[Settings, DocumentLibrary, TestClient]]:
     settings = Settings(
         environment="test",
+        rag_preload_on_startup=False,
         documents_path=tmp_path / "documents",
         upload_max_bytes=4_096,
         chunk_size_tokens=32,
@@ -270,6 +271,7 @@ def test_actual_body_limit_cannot_be_bypassed_with_content_length(
 def test_document_capacity_preserves_existing_upload_and_allows_duplicate(tmp_path: Path) -> None:
     settings = Settings(
         environment="test",
+        rag_preload_on_startup=False,
         documents_path=tmp_path / "documents",
         upload_max_documents=1,
     )
@@ -289,6 +291,7 @@ def test_document_capacity_preserves_existing_upload_and_allows_duplicate(tmp_pa
 def test_chunk_capacity_rejects_upload_without_partial_document(tmp_path: Path) -> None:
     settings = Settings(
         environment="test",
+        rag_preload_on_startup=False,
         documents_path=tmp_path / "documents",
         chunk_strategy="fixed",
         chunk_size_tokens=32,

@@ -55,6 +55,7 @@ class SystemTrace(BaseModel):
     request_id: str
     created_at: datetime
     question: str
+    cache_hit: bool = False
     status: RAGStatus
     total_ms: float = Field(ge=0)
     stages: list[TraceStage]

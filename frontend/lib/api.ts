@@ -28,6 +28,7 @@ export interface TraceSource {
 }
 
 export interface SystemTrace {
+  cache_hit: boolean;
   trace_id: string;
   request_id: string;
   created_at: string;
@@ -42,6 +43,7 @@ export interface SystemTrace {
 }
 
 export interface AnswerResult {
+  cache_hit: boolean;
   question: string;
   status: RagStatus;
   answer: string;

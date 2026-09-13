@@ -46,9 +46,23 @@ curl -X POST http://127.0.0.1:8000/rag/answer \
   -d '{"question":"What caused incident 2026-001?"}'
 ```
 
-The first request lazily loads the embedding model, reranker, and language model. Later
-requests reuse those model instances. The endpoint performs blocking model work in a
-worker thread so it does not block the FastAPI event loop.
+API startup loads the embedding model, reranker, and language model and prepares the
+current index before accepting requests. Preparation runs in a worker thread; failures
+abort startup and close owned storage resources. No answer is generated during preparation.
+Set `PAKE_RAG_PRELOAD_ON_STARTUP=false` to load on the first question instead.
+Requests reuse these model instances, and blocking work runs in a worker thread.
+
+The service caches only validated `answered` results in a bounded in-memory LRU cache.
+The default capacity is 256 and TTL is 900 seconds from insertion, configurable through
+`PAKE_RAG_CACHE_MAX_ENTRIES` (zero disables) and `PAKE_RAG_CACHE_TTL_SECONDS`.
+Questions match exactly after trimming outer whitespace, with the same effective `top_k`
+and uploaded document revision. A configuration snapshot and base corpus belong to one
+service lifetime: restart after changing model/prompt/settings or bundled files. There is
+no semantic matching and no cache shared across processes. Upload revision checks happen
+before every cache lookup; a failed refresh raises an error instead of serving stale data.
+Duplicate uploads do not invalidate the cache. Stored answers are deep-copied so callers
+cannot alter future responses. Concurrent identical requests share the existing runtime
+lock and generate only once when a valid answer can be cached.
 
 ## Evaluation
 

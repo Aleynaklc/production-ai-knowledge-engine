@@ -145,6 +145,15 @@ def create_app(
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         try:
+            if (
+                isinstance(service_provider, LazyRAGService)
+                and runtime_settings.rag_preload_on_startup
+            ):
+                logger.info(
+                    "Preparing local RAG models and retrieval index before serving requests"
+                )
+                await run_in_threadpool(service_provider.prepare)
+                logger.info("Local RAG runtime is ready")
             yield
         finally:
             if isinstance(service_provider, LazyRAGService):

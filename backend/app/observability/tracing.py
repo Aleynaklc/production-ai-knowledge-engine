@@ -16,11 +16,12 @@ def build_system_trace(answer: RAGAnswer, request_id: str) -> SystemTrace:
     """Build an API-safe trace from timings and lineage already produced by RAG."""
 
     generated = answer.raw_answer is not None
-    return SystemTrace(
+    trace = SystemTrace(
         trace_id=str(uuid4()),
         request_id=request_id,
         created_at=datetime.now(UTC),
         question=answer.question,
+        cache_hit=answer.cache_hit,
         status=answer.status,
         total_ms=answer.timings.total_ms,
         stages=[
@@ -98,3 +99,21 @@ def build_system_trace(answer: RAGAnswer, request_id: str) -> SystemTrace:
         validation_issues=answer.validation.issues,
         fallback_used=answer.fallback_used,
     )
+    if answer.cache_hit:
+        return trace.model_copy(
+            update={
+                "stages": [
+                    stage.model_copy(
+                        update={
+                            "status": "skipped",
+                            "duration_ms": 0.0,
+                            "summary": "Reused a cached, validated answer; this stage did not run.",
+                            "metrics": {"cache_hit": True},
+                        }
+                    )
+                    for stage in trace.stages
+                ],
+                "tokens": TraceTokenUsage(context=0, input=0, output=0),
+            }
+        )
+    return trace

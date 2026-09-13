@@ -216,8 +216,23 @@ Run the 20-question answer, citation, grounding, and abstention benchmark:
 uv run python -m scripts.evaluate_rag
 ```
 
-The same pipeline is available at `POST /rag/answer`. Models are loaded lazily on the
-first RAG request. See the [Grounded RAG design](docs/grounded-rag.md) and current
+The same pipeline is available at `POST /rag/answer`. By default, API startup loads the
+embedding model, reranker, and language model and builds the retrieval index before
+accepting requests. The first launch may download pinned model weights; later launches
+reuse the download cache. Startup fails if preparation fails. This moves loading cost
+to startup; it does not eliminate inference latency or execute a warmup generation.
+Set `PAKE_RAG_PRELOAD_ON_STARTUP=false` to opt into lazy loading for lightweight development.
+
+Repeated questions reuse validated answers through a process-local LRU cache (256 entries,
+15-minute TTL by default). Keys distinguish the document revision, question (outer whitespace
+trimmed, otherwise exact), and effective `top_k`. The cache belongs to one runtime/configuration;
+changing model, prompt, retrieval settings, or the bundled corpus requires restarting the API.
+New uploads invalidate previous answers before the next lookup; duplicate uploads retain them.
+Rejected, abstained, and invalid answers are not cached. Set `PAKE_RAG_CACHE_MAX_ENTRIES=0`
+to disable caching. Cached responses retain citations, expose `cache_hit=true`, report no new
+generation tokens, and get fresh request/trace IDs. Restarting clears the cache.
+
+See the [Grounded RAG design](docs/grounded-rag.md) and current
 [RAG evaluation](docs/rag-evaluation.md). The earlier
 [Stage 13–16 report](docs/grounded-rag-evaluation.md) is retained as historical evidence.
 
@@ -289,6 +304,9 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_RAG_STRICT_GROUNDING` | `true` | Suppress answers that fail citation validation |
 | `PAKE_RAG_MIN_RETRIEVAL_SCORE` | `0.8` | Cross-encoder confidence floor for generation |
 | `PAKE_RAG_EXTRACTIVE_FALLBACK_SCORE` | `1.0` | Minimum score for cited extractive fallback |
+| `PAKE_RAG_PRELOAD_ON_STARTUP` | `true` | Prepare models and index before accepting requests |
+| `PAKE_RAG_CACHE_MAX_ENTRIES` | `256` | In-process LRU answer capacity; `0` disables caching |
+| `PAKE_RAG_CACHE_TTL_SECONDS` | `900` | Answer lifetime from insertion; hits do not extend it |
 | `PAKE_API_CORS_ORIGINS` | local ports 3000 and 5173 | Comma-separated allowed browser origins |
 | `PAKE_TRACE_MAX_RECORDS` | `200` | Maximum recent in-process system traces |
 | `PAKE_DOCUMENTS_PATH` | `data/uploads/documents.sqlite3` | Persistent uploaded documents and chunks |
