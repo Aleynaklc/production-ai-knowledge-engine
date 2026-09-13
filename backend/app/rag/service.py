@@ -45,6 +45,9 @@ def _citation(source: ContextSource) -> AnswerCitation:
         title=source.title,
         snippet=snippet,
         retrieval_score=source.retrieval_score,
+        document_version=source.document_version,
+        source_unit=source.source_unit,
+        source_kind=source.source_kind,
     )
 
 

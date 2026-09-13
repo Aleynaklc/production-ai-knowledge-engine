@@ -1,258 +1,301 @@
 'use client';
 
-import { Check, FileText, LoaderCircle, RefreshCw, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { SyntheticEvent } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getDocuments, uploadDocument } from '@/lib/api';
+import { SourceViewer } from '@/components/source-viewer';
+import type { SourceLocation } from '@/components/source-viewer';
+import {
+  deleteDocument,
+  getDocuments,
+  replaceDocument,
+  retryDocument,
+  uploadDocument,
+} from '@/lib/api';
 import type { DocumentLibraryResponse } from '@/lib/api';
-
-function fileSize(bytes: number) {
-  return bytes >= 1024 * 1024
-    ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-    : `${Math.max(1, Math.ceil(bytes / 1024))} KB`;
-}
 
 export function DocumentLibrary({
   onUploaded,
   onBusyChange,
-  answering,
 }: {
   onUploaded: () => void;
   onBusyChange: (busy: boolean) => void;
   answering: boolean;
 }) {
   const [library, setLibrary] = useState<DocumentLibraryResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [replaceId, setReplaceId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [source, setSource] = useState<SourceLocation | null>(null);
   const input = useRef<HTMLInputElement>(null);
-
+  const onChange = useRef(onUploaded);
+  useEffect(() => {
+    onChange.current = onUploaded;
+  }, [onUploaded]);
   useEffect(() => {
     let active = true;
-    getDocuments()
-      .then((result) => {
-        if (active) setLibrary(result);
-      })
-      .catch((error: Error) => {
-        if (active) setLoadError(error.message);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    let timer: ReturnType<typeof setTimeout>;
+    let lastRevision: string | null = null;
+    async function poll() {
+      try {
+        const result = await getDocuments();
+        if (!active) return;
+        const revision = result.documents
+          .map((item) => `${item.id}:${item.active_version}`)
+          .sort()
+          .join('|');
+        if (lastRevision !== null && lastRevision !== revision)
+          onChange.current();
+        lastRevision = revision;
+        setLibrary(result);
+      } catch (caught) {
+        if (active) setError((caught as Error).message);
+      }
+      if (active) timer = setTimeout(poll, 1500);
+    }
+    void poll();
     return () => {
       active = false;
+      clearTimeout(timer);
     };
   }, []);
-
   async function refresh() {
-    setLoading(true);
-    setLoadError(null);
-    try {
-      setLibrary(await getDocuments());
-    } catch (error) {
-      setLoadError(
-        error instanceof Error ? error.message : 'Could not load documents.',
-      );
-    } finally {
-      setLoading(false);
-    }
+    setLibrary(await getDocuments());
   }
-
-  function chooseFile(selected: File | null) {
-    setMessage(null);
-    setUploadError(null);
-    setFile(null);
-    if (!selected || !library) return;
+  async function submit(event: SyntheticEvent) {
+    event.preventDefault();
+    if (!file || !library || busy) return;
     if (
-      !library.supported_extensions.some((extension) =>
-        selected.name.toLowerCase().endsWith(extension),
+      !library.supported_extensions.some((suffix) =>
+        file.name.toLowerCase().endsWith(suffix),
       )
     ) {
-      setUploadError('Choose a Markdown (.md) or text (.txt) document.');
+      setError('Choose a PDF, DOCX, Markdown, or text document.');
       return;
     }
-    if (selected.size === 0) {
-      setUploadError(
-        'This file is empty. Choose a document that contains text.',
-      );
+    if (!file.size || file.size > library.max_file_bytes) {
+      setError('The file is empty or exceeds the upload limit.');
       return;
     }
-    if (selected.size > library.max_file_bytes) {
-      setUploadError(
-        `Choose a file smaller than ${fileSize(library.max_file_bytes)}.`,
-      );
-      return;
-    }
-    setFile(selected);
-  }
-
-  async function submit(event: SyntheticEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!file || loading || uploading || answering || !library) return;
-    setUploading(true);
+    setBusy(true);
     onBusyChange(true);
-    setUploadError(null);
-    setMessage(null);
+    setError('');
+    setMessage('');
     try {
-      const result = await uploadDocument(file);
-      setLibrary((current) => {
-        if (!current) return current;
-        const documents = [
-          result.document,
-          ...current.documents.filter((item) => item.id !== result.document.id),
-        ];
-        return { ...current, documents, count: documents.length };
-      });
+      const result = replaceId
+        ? await replaceDocument(replaceId, file)
+        : await uploadDocument(file);
       setMessage(
         result.duplicate
-          ? `${result.document.filename} is already in the library.`
-          : `${result.document.filename} is ready. Ask a question about its contents below.`,
+          ? 'This document is already in your workspace.'
+          : 'Upload accepted. You can keep asking questions while it is processed.',
       );
       setFile(null);
+      setReplaceId(null);
       if (input.current) input.current.value = '';
+      await refresh();
       onUploaded();
-    } catch (error) {
-      setUploadError(
-        error instanceof Error
-          ? error.message
-          : 'The upload failed. Please retry.',
-      );
+    } catch (caught) {
+      setError((caught as Error).message);
     } finally {
-      setUploading(false);
+      setBusy(false);
       onBusyChange(false);
     }
   }
-
+  async function remove(id: string) {
+    setBusy(true);
+    setError('');
+    try {
+      await deleteDocument(id);
+      setDeleteId(null);
+      setSource(null);
+      await refresh();
+      onUploaded();
+    } catch (caught) {
+      setError((caught as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function retry(id: string) {
+    setBusy(true);
+    setError('');
+    try {
+      await retryDocument(id);
+      await refresh();
+    } catch (caught) {
+      setError((caught as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
     <Card className="border-white/8 bg-panel/88 ring-0">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="flex items-center gap-2 font-display text-xl text-ink">
-            <Upload className="size-5 text-mint" /> Upload a document
-          </CardTitle>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={refresh}
-            disabled={loading || uploading}
-            aria-label="Refresh uploaded documents"
-            className="text-ink-dim"
-          >
-            <RefreshCw className={`size-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-        <p className="text-sm leading-6 text-ink-dim">
-          Add UTF-8 Markdown or text files
-          {library ? `, up to ${fileSize(library.max_file_bytes)} each` : ''}.{' '}
-          Uploads are shared with everyone who can access this console.
+      <CardHeader>
+        <CardTitle className="text-xl">Workspace documents</CardTitle>
+        <p className="text-base text-ink-dim">
+          PDF, DOCX, Markdown and text
+          {library
+            ? ` · up to ${Math.round(library.max_file_bytes / 1024 / 1024)} MB per file`
+            : ''}
+          . Only members of this workspace can access these documents.
         </p>
       </CardHeader>
       <CardContent>
-        {loadError ? (
-          <p
-            role="alert"
-            className="mb-4 rounded-lg border border-amber-200/20 bg-amber-200/5 p-3 text-sm text-amber-200"
-          >
-            {loadError} Use the refresh button to retry.
+        {error && (
+          <p role="alert" className="mb-4 text-sm text-red-200">
+            {error}
           </p>
-        ) : null}
-        <form onSubmit={submit} className="space-y-3" aria-busy={uploading}>
-          <label
-            htmlFor="document-file"
-            className="block text-sm font-medium text-ink"
-          >
-            Document file
-          </label>
-          <input
-            ref={input}
-            id="document-file"
-            type="file"
-            accept=".md,.txt,text/plain,text/markdown"
-            disabled={uploading || loading || !library}
-            onChange={(event) => chooseFile(event.target.files?.[0] ?? null)}
-            aria-describedby="upload-feedback"
-            className="block w-full min-w-0 rounded-lg border border-white/10 bg-canvas/65 p-2 text-sm text-ink-dim file:mr-3 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-sm file:font-medium file:text-ink hover:file:bg-white/15 focus-visible:outline-2 focus-visible:outline-mint disabled:opacity-50"
-          />
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="min-w-0 break-all text-sm text-ink-dim">
-              {file
-                ? `${file.name} · ${fileSize(file.size)}`
-                : 'Choose a file to add to the knowledge base.'}
-            </p>
-            <Button
-              type="submit"
-              disabled={!file || loading || uploading || answering || !library}
-              className="shrink-0 bg-mint text-canvas hover:bg-mint/85"
-            >
-              {uploading ? (
-                <LoaderCircle className="size-4 animate-spin" />
-              ) : (
-                <Upload className="size-4" />
+        )}
+        {message && (
+          <output className="mb-4 block text-sm text-mint">{message}</output>
+        )}
+        {!library && !error && <p aria-busy="true">Loading documents…</p>}
+        {library && library.role !== 'reader' && (
+          <form onSubmit={submit} className="mb-5 space-y-3">
+            <label className="block text-sm">
+              {replaceId ? 'Replacement file' : 'Add a document'}
+              <input
+                ref={input}
+                type="file"
+                accept=".md,.txt,.pdf,.docx"
+                disabled={busy}
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                className="mt-2 block w-full rounded-lg border border-white/10 bg-canvas p-3 text-sm file:mr-3 file:rounded file:border-0 file:bg-white/10 file:p-2 file:text-ink"
+              />
+            </label>
+            <div className="flex flex-wrap gap-3">
+              <Button type="submit" disabled={!file || busy}>
+                {busy
+                  ? 'Uploading…'
+                  : replaceId
+                    ? 'Upload new version'
+                    : 'Upload document'}
+              </Button>
+              {replaceId && (
+                <Button variant="ghost" onClick={() => setReplaceId(null)}>
+                  Cancel replacement
+                </Button>
               )}
-              {uploading ? 'Preparing document…' : 'Upload document'}
-            </Button>
-          </div>
-          <div id="upload-feedback" aria-live="polite">
-            {uploadError ? (
-              <p role="alert" className="text-sm leading-6 text-red-200">
-                {uploadError}
-              </p>
-            ) : null}
-            {message ? (
-              <output className="block text-sm leading-6 text-mint">
-                {message}
-              </output>
-            ) : null}
-          </div>
-        </form>
-        <div className="mt-5 border-t border-white/7 pt-4">
-          <p className="mb-3 text-sm font-medium text-ink">
-            Uploaded documents{library ? ` (${library.count})` : ''}
+            </div>
+          </form>
+        )}
+        {library?.count === 0 && (
+          <p className="py-4 text-base text-ink-dim">
+            No documents yet. Add a document and wait until it is ready before
+            asking a question.
           </p>
-          {loading ? (
-            <output className="block text-sm text-ink-dim">
-              Loading documents…
-            </output>
-          ) : null}
-          {!loading && library?.count === 0 ? (
-            <p className="text-sm text-ink-dim">
-              Your uploaded documents will appear here.
-            </p>
-          ) : null}
-          {library && library.count > 0 ? (
-            <ul
-              className="max-h-60 space-y-2 overflow-y-auto pr-1"
-              aria-label="Uploaded documents"
-            >
-              {library.documents.map((document) => (
-                <li
-                  key={document.id}
-                  className="flex min-w-0 items-start gap-3 rounded-lg border border-white/7 bg-canvas/40 p-3"
+        )}
+        <ul className="space-y-3">
+          {library?.documents.map((item) => (
+            <li key={item.id} className="rounded-lg border border-white/10 p-4">
+              <div className="flex flex-wrap justify-between gap-3">
+                <span className="break-all text-base font-medium">
+                  {item.filename}
+                </span>
+                <span
+                  className={`text-sm ${item.status === 'failed' ? 'text-red-200' : item.status === 'processing' ? 'text-amber-200' : 'text-mint'}`}
                 >
-                  <FileText className="mt-0.5 size-4 shrink-0 text-mint" />
-                  <div className="min-w-0 flex-1">
-                    <p className="break-words text-sm font-medium text-ink">
-                      {document.title}
-                    </p>
-                    <p className="mt-1 break-all text-xs text-ink-dim">
-                      {document.filename} · {fileSize(document.size_bytes)}
-                    </p>
+                  {item.status === 'processing'
+                    ? 'Processing…'
+                    : item.status === 'failed'
+                      ? 'Failed'
+                      : 'Ready'}
+                </span>
+              </div>
+              <p className="mt-2 text-sm text-ink-dim">
+                Version {item.version} · {item.chunk_count} indexed passages
+                {item.status !== 'ready' && item.active_version
+                  ? ` · Version ${item.active_version} is still available for questions`
+                  : ''}
+              </p>
+              {item.error && (
+                <p className="mt-2 text-sm text-red-200">{item.error}</p>
+              )}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {item.active_version && (
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      setSource({
+                        documentId: item.id,
+                        version: item.active_version!,
+                        unit: 1,
+                      })
+                    }
+                  >
+                    View source
+                  </Button>
+                )}
+                {library.role !== 'reader' && (
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled={busy || item.status === 'processing'}
+                      onClick={() => {
+                        setReplaceId(item.id);
+                        setFile(null);
+                        if (input.current) {
+                          input.current.value = '';
+                          input.current.focus();
+                        }
+                      }}
+                    >
+                      Replace
+                    </Button>
+                    {item.status === 'failed' && (
+                      <Button
+                        variant="outline"
+                        disabled={busy}
+                        onClick={() => retry(item.id)}
+                      >
+                        Retry
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      disabled={busy}
+                      onClick={() => setDeleteId(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+              </div>
+              {deleteId === item.id && (
+                <div className="mt-3 rounded-lg border border-red-200/20 p-3 text-sm">
+                  <p>
+                    Delete this document and all its versions? This cannot be
+                    undone.
+                  </p>
+                  <div className="mt-3 flex gap-3">
+                    <Button
+                      disabled={busy}
+                      variant="destructive"
+                      onClick={() => remove(item.id)}
+                    >
+                      Delete permanently
+                    </Button>
+                    <Button variant="ghost" onClick={() => setDeleteId(null)}>
+                      Cancel
+                    </Button>
                   </div>
-                  <span className="flex shrink-0 items-center gap-1 text-xs text-mint">
-                    <Check className="size-3" /> Ready
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+        {source && (
+          <SourceViewer
+            key={`${source.documentId}:${source.version}`}
+            source={source}
+            onClose={() => setSource(null)}
+          />
+        )}
       </CardContent>
     </Card>
   );

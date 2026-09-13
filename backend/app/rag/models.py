@@ -21,6 +21,9 @@ class AnswerCitation(BaseModel):
     title: str
     snippet: str
     retrieval_score: float
+    document_version: int | None = None
+    source_unit: int | None = None
+    source_kind: str | None = None
 
 
 class RAGTiming(BaseModel):

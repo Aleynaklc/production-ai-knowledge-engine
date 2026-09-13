@@ -6,11 +6,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.app.config import Settings
-from backend.app.main import create_app
 from backend.app.observability.models import SystemTrace, TraceTokenUsage
 from backend.app.observability.store import TraceStore
 from backend.app.rag.citations import CitationValidation
 from backend.app.rag.models import AnswerCitation, RAGAnswer, RAGTiming
+from tests.legacy_api import create_app
 
 
 class FakeAnswerService:

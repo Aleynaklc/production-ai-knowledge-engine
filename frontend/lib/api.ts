@@ -8,6 +8,9 @@ export interface AnswerCitation {
   title: string;
   snippet: string;
   retrieval_score: number;
+  document_version?: number;
+  source_unit?: number;
+  source_kind?: string;
 }
 
 export interface TraceStage {
@@ -100,7 +103,10 @@ export interface UploadedDocument {
   chunk_strategy: 'fixed' | 'recursive';
   chunk_size_tokens: number;
   overlap_tokens: number;
-  status: 'ready';
+  status: 'processing' | 'ready' | 'failed';
+  version: number;
+  active_version: number | null;
+  error: string | null;
 }
 
 export interface DocumentLibraryResponse {
@@ -108,7 +114,8 @@ export interface DocumentLibraryResponse {
   count: number;
   max_file_bytes: number;
   supported_extensions: string[];
-  scope: 'shared';
+  scope: 'workspace';
+  role: 'owner' | 'editor' | 'reader';
 }
 
 export interface DocumentUploadResponse {
@@ -121,13 +128,27 @@ interface ErrorResponse {
 }
 
 export const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:8000'
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000'
 ).replace(/\/$/, '');
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+let workspaceId = '';
+export function selectWorkspace(id: string) {
+  workspaceId = id;
+}
+
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, init);
+    const headers = new Headers(init?.headers);
+    headers.set('X-Workspace-ID', workspaceId);
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      credentials: 'include',
+      headers,
+    });
   } catch {
     throw new Error(
       'The knowledge service is unreachable. Check your connection and try again.',
@@ -166,4 +187,79 @@ export function uploadDocument(file: File): Promise<DocumentUploadResponse> {
     headers: { 'Content-Type': 'application/octet-stream' },
     body: file,
   });
+}
+
+export interface Workspace {
+  id: string;
+  name: string;
+  role: 'owner' | 'editor' | 'reader';
+}
+export interface Session {
+  user: { id: string; email: string };
+  workspaces: Workspace[];
+}
+export const getSession = () => apiFetch<Session>('/api/v1/auth/me');
+export function signIn(
+  email: string,
+  password: string,
+  workspaceName?: string,
+) {
+  return apiFetch<Session>(
+    `/api/v1/auth/${workspaceName === undefined ? 'login' : 'register'}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, workspace_name: workspaceName }),
+    },
+  );
+}
+export const signOut = () =>
+  apiFetch('/api/v1/auth/logout', { method: 'POST' });
+export const deleteDocument = (id: string) =>
+  apiFetch(`/api/v1/documents/${encodeURIComponent(id)}`, { method: 'DELETE' });
+export const retryDocument = (id: string) =>
+  apiFetch(`/api/v1/documents/${encodeURIComponent(id)}/retry`, {
+    method: 'POST',
+  });
+export function replaceDocument(id: string, file: File) {
+  return apiFetch<DocumentUploadResponse>(
+    `/api/v1/documents/${encodeURIComponent(id)}?${new URLSearchParams({ filename: file.name })}`,
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: file,
+    },
+  );
+}
+export interface SourcePage {
+  filename: string;
+  version: number;
+  unit: { number: number; kind: string; text: string };
+  unit_count: number;
+}
+export function getSource(id: string, version: number, unit: number) {
+  return apiFetch<SourcePage>(
+    `/api/v1/documents/${encodeURIComponent(id)}/source?${new URLSearchParams({ version: String(version), unit: String(unit) })}`,
+  );
+}
+export async function downloadSource(
+  id: string,
+  version: number,
+  filename: string,
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/documents/${encodeURIComponent(id)}/download?version=${version}`,
+    {
+      credentials: 'include',
+      headers: { 'X-Workspace-ID': workspaceId },
+    },
+  );
+  if (!response.ok)
+    throw new Error('The original document could not be downloaded.');
+  const url = URL.createObjectURL(await response.blob());
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

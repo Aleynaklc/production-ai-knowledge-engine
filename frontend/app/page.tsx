@@ -24,6 +24,9 @@ import type { ReactNode, SyntheticEvent } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { DocumentLibrary } from '@/components/document-library';
+import { WorkspaceGate } from '@/components/workspace-gate';
+import { SourceViewer } from '@/components/source-viewer';
+import type { SourceLocation } from '@/components/source-viewer';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -46,9 +49,9 @@ import {
 } from '@/lib/api';
 
 const sampleQuestions = [
-  'How long do access tokens last?',
-  'Which algorithm signs webhooks?',
-  'What is the severity-two response target?',
+  'What does the uploaded document say about access?',
+  'What are the main requirements in this document?',
+  'Which deadlines are mentioned in the document?',
 ];
 
 const stageDetails: Record<
@@ -248,12 +251,13 @@ function AnswerLoading() {
   );
 }
 
-export default function Home() {
+function KnowledgeConsole() {
+  const [source, setSource] = useState<SourceLocation | null>(null);
   const [question, setQuestion] = useState(sampleQuestions[0]);
   const [response, setResponse] = useState<AnswerResponse | null>(null);
   const [system, setSystem] = useState<SystemResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -265,7 +269,7 @@ export default function Home() {
   async function submit(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
     event.preventDefault();
     const normalizedQuestion = question.trim();
-    if (!normalizedQuestion || isLoading || isUploading) return;
+    if (!normalizedQuestion || isLoading) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -317,7 +321,7 @@ export default function Home() {
               className="border-white/10 bg-white/[0.03] font-mono text-[10px] text-ink-dim"
             >
               <KeyRound data-icon="inline-start" />
-              NO API KEY
+              PRIVATE WORKSPACE
             </Badge>
           </div>
         </div>
@@ -384,7 +388,7 @@ export default function Home() {
                     <Button
                       type="submit"
                       size="icon-lg"
-                      disabled={!question.trim() || isLoading || isUploading}
+                      disabled={!question.trim() || isLoading}
                       aria-label="Ask knowledge engine"
                       className="absolute bottom-3 right-3 rounded-lg bg-mint text-canvas shadow-[0_8px_25px_rgba(113,241,199,0.16)] hover:bg-mint/85"
                     >
@@ -468,6 +472,13 @@ export default function Home() {
 
             {!isLoading && response?.result.citations.length ? (
               <section aria-labelledby="sources-heading">
+                {source && (
+                  <SourceViewer
+                    key={`${source.documentId}:${source.version}:${source.unit}`}
+                    source={source}
+                    onClose={() => setSource(null)}
+                  />
+                )}
                 <div className="mb-3 flex items-center justify-between">
                   <h2 id="sources-heading" className="eyebrow">
                     <FileText className="size-3.5" /> Cited evidence
@@ -502,7 +513,25 @@ export default function Home() {
                           <span className="truncate font-mono text-[9px] uppercase tracking-[0.1em] text-ink-faint">
                             {citation.source}
                           </span>
-                          <ArrowUpRight className="size-3.5 shrink-0 text-ink-faint" />
+                          {citation.document_version && citation.source_unit ? (
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                setSource({
+                                  documentId: citation.document_id,
+                                  version: citation.document_version!,
+                                  unit: citation.source_unit!,
+                                })
+                              }
+                            >
+                              Open{' '}
+                              {citation.source_kind === 'page'
+                                ? 'page'
+                                : 'section'}{' '}
+                              {citation.source_unit}
+                              <ArrowUpRight className="size-3.5" />
+                            </Button>
+                          ) : null}
                         </div>
                       </CardContent>
                     </Card>
@@ -525,5 +554,13 @@ export default function Home() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <WorkspaceGate>
+      {(workspace) => <KnowledgeConsole key={workspace.id} />}
+    </WorkspaceGate>
   );
 }

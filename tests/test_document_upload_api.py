@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 
 from backend.app.config import Settings
 from backend.app.documents.library import DocumentLibrary
-from backend.app.main import create_app
+from tests.legacy_api import create_app
 
 
 class WordCodec:

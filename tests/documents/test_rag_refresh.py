@@ -15,7 +15,6 @@ from backend.app.documents.library import DocumentLibrary
 from backend.app.ingestion.models import DocumentChunk
 from backend.app.ingestion.pipeline import write_chunks
 from backend.app.llm.generation import GenerationOptions, GenerationResult
-from backend.app.main import create_app
 from backend.app.rag.cache import AnswerCache
 from backend.app.rag.context import ContextBuilder
 from backend.app.rag.factory import LazyRAGService, RAGRuntime
@@ -23,6 +22,7 @@ from backend.app.rag.service import RAGService
 from backend.app.retrieval.dense import QdrantDenseRetriever
 from backend.app.retrieval.hybrid import HybridRetriever
 from backend.app.retrieval.reranker import RerankedRetriever
+from tests.legacy_api import create_app
 
 
 class WordCodec:

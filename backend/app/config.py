@@ -45,13 +45,20 @@ class Settings(BaseSettings):
     rag_cache_max_entries: int = Field(default=256, ge=0, le=10_000)
     rag_cache_ttl_seconds: int = Field(default=900, ge=1, le=86_400)
     api_cors_origins: str = (
-        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173"
+        "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,"
+        "http://localhost:5173,http://127.0.0.1:5173"
     )
     trace_max_records: int = Field(default=200, ge=1, le=10_000)
     documents_path: Path = Path("data/uploads/documents.sqlite3")
     upload_max_bytes: int = Field(default=5 * 1024 * 1024, ge=1, le=50 * 1024 * 1024)
     upload_max_documents: int = Field(default=100, ge=1, le=10_000)
     upload_max_chunks: int = Field(default=2_000, ge=1, le=100_000)
+    workspaces_path: Path = Path("data/workspaces")
+    auth_session_seconds: int = Field(default=28_800, ge=60, le=604_800)
+    auth_allow_registration: bool = True
+    upload_max_expanded_bytes: int = Field(default=20 * 1024 * 1024, ge=1)
+    upload_max_pages: int = Field(default=500, ge=1, le=5_000)
+    upload_max_versions: int = Field(default=10, ge=1, le=100)
 
     @model_validator(mode="after")
     def validate_chunk_window(self) -> "Settings":

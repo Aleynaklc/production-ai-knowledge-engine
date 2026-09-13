@@ -1,5 +1,10 @@
 # API, system trace, and Frontend V1
 
+> The production API now uses email/password accounts, workspace authorization, asynchronous
+> document processing, PDF/DOCX sources, and versioned document management. See the
+> [current workspace contract](workspaces.md). Shared API examples below describe the earlier
+> implementation/benchmark harness and are not an unauthenticated production endpoint.
+
 Stages 18–20 expose the grounded RAG pipeline through a versioned HTTP API, record a
 bounded execution trace for every answer, and render the result in a responsive web console.
 All inference remains local; no external model API key is required.

@@ -9,7 +9,6 @@ from backend.app.config import Settings
 from backend.app.evaluation.rag import GroundedEvaluationQuery, evaluate_rag
 from backend.app.ingestion.models import DocumentChunk
 from backend.app.llm.generation import GenerationOptions, GenerationResult
-from backend.app.main import create_app
 from backend.app.rag.citations import validate_citations
 from backend.app.rag.context import ContextBuilder
 from backend.app.rag.fallback import ExtractiveFallback
@@ -21,6 +20,7 @@ from backend.app.rag.prompt import (
 )
 from backend.app.rag.service import RAGService
 from backend.app.retrieval.models import RetrievalResult
+from tests.legacy_api import create_app
 
 
 class WordCodec:

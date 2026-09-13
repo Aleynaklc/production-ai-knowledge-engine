@@ -81,31 +81,30 @@ npm run dev
 
 Open <http://localhost:3000>. The local API and frontend do not require an external AI API key.
 
-### Upload documents
+### Workspaces and documents
 
-Use **Upload a document** in the console to choose a UTF-8 `.md` or `.txt` file.
-The API validates and chunks it, saves it in the document library, and includes it in
-retrieval before the next answer. The library is shared by everyone who can access this
-API; uploads are not private to a user. Uploaded documents appear alongside the bundled
-NovaStack knowledge base in retrieval and citations.
+Create an account with your email, password, and workspace name in the console. Owners can
+add existing accounts as editors or readers. Documents, retrieval, answers, caches, sources,
+and traces are isolated by workspace and authorized on every request.
 
-The default limit is 5 MiB per file, 100 documents, and 2,000 uploaded chunks in total.
-Identical file contents return the existing document instead of creating a duplicate.
-Documents and chunks persist across restarts in `data/uploads/documents.sqlite3`.
-Chunking uses `PAKE_CHUNK_STRATEGY` (`recursive` by default), with 160 tokens per chunk
-and 30 tokens of overlap; changing these settings affects subsequent uploads.
+Upload PDF, DOCX, Markdown, or UTF-8 text files. Uploads return immediately after durable
+admission and progress through **Processing → Ready / Failed** in the document panel.
+You can keep asking questions about ready documents while background processing runs.
+PDF citations open the relevant page's extracted text; DOCX citations open a section.
+Original source files can be downloaded. Image-only PDFs require OCR before uploading.
 
-The same workflow is available directly through the API:
+Use **Replace** to upload a new version, **Retry** after a processing failure, or **Delete**
+to remove a document and its versions. Failed replacements keep the previous ready version.
+Indexing embeds only added/replaced documents and updates their vectors; successful changes
+invalidate the affected workspace's answer cache.
 
-```bash
-curl -X POST 'http://127.0.0.1:8000/api/v1/documents?filename=guide.md' \
-  -H 'Content-Type: application/octet-stream' \
-  --data-binary @guide.md
-curl 'http://127.0.0.1:8000/api/v1/documents'
-```
+Existing shared uploads are preserved and require an explicit administrator import into a
+chosen workspace. They are never automatically exposed to new accounts. The bundled NovaStack
+corpus remains available to benchmark/CLI workflows, not private workspace retrieval.
 
-The upload body contains the raw file bytes. See the [API contract](docs/api-system-trace-and-frontend.md)
-for responses and validation errors. PDF and Word files are not supported by this uploader.
+See [Workspace setup, API, limits, and migration](docs/workspaces.md) for account provisioning,
+permissions, cookie deployment requirements, background-job recovery, and legacy imports.
+Use `localhost` for both local services; the default API URL is `http://localhost:8000`.
 
 ## Quality checks
 
@@ -216,7 +215,8 @@ Run the 20-question answer, citation, grounding, and abstention benchmark:
 uv run python -m scripts.evaluate_rag
 ```
 
-The same pipeline is available at `POST /rag/answer`. By default, API startup loads the
+The workspace pipeline is available at authenticated `POST /rag/answer`; the CLI uses the
+benchmark corpus. By default, API startup loads the
 embedding model, reranker, and language model and builds the retrieval index before
 accepting requests. The first launch may download pinned model weights; later launches
 reuse the download cache. Startup fails if preparation fails. This moves loading cost
@@ -225,9 +225,10 @@ Set `PAKE_RAG_PRELOAD_ON_STARTUP=false` to opt into lazy loading for lightweight
 
 Repeated questions reuse validated answers through a process-local LRU cache (256 entries,
 15-minute TTL by default). Keys distinguish the document revision, question (outer whitespace
-trimmed, otherwise exact), and effective `top_k`. The cache belongs to one runtime/configuration;
-changing model, prompt, retrieval settings, or the bundled corpus requires restarting the API.
-New uploads invalidate previous answers before the next lookup; duplicate uploads retain them.
+trimmed, otherwise exact), and effective `top_k`. Each workspace has its own cache and
+membership is checked before access. The cache belongs to one runtime/configuration;
+changing model, prompt, or retrieval settings requires restarting the API.
+Successfully indexed uploads invalidate the affected workspace cache; duplicate uploads retain them.
 Rejected, abstained, and invalid answers are not cached. Set `PAKE_RAG_CACHE_MAX_ENTRIES=0`
 to disable caching. Cached responses retain citations, expose `cache_hit=true`, report no new
 generation tokens, and get fresh request/trace IDs. Restarting clears the cache.
@@ -309,10 +310,16 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_RAG_CACHE_TTL_SECONDS` | `900` | Answer lifetime from insertion; hits do not extend it |
 | `PAKE_API_CORS_ORIGINS` | local ports 3000 and 5173 | Comma-separated allowed browser origins |
 | `PAKE_TRACE_MAX_RECORDS` | `200` | Maximum recent in-process system traces |
-| `PAKE_DOCUMENTS_PATH` | `data/uploads/documents.sqlite3` | Persistent uploaded documents and chunks |
+| `PAKE_DOCUMENTS_PATH` | `data/uploads/documents.sqlite3` | Preserved legacy shared library; used by import/CLI |
+| `PAKE_WORKSPACES_PATH` | `data/workspaces` | Accounts, sessions, isolated libraries, queues, and indexes |
+| `PAKE_AUTH_SESSION_SECONDS` | `28800` | Session lifetime |
+| `PAKE_AUTH_ALLOW_REGISTRATION` | `true` | Allow account creation from the console |
+| `PAKE_UPLOAD_MAX_EXPANDED_BYTES` | `20971520` | Expanded/extracted document limit |
+| `PAKE_UPLOAD_MAX_PAGES` | `500` | Maximum PDF pages |
+| `PAKE_UPLOAD_MAX_VERSIONS` | `10` | Maximum versions per document |
 | `PAKE_UPLOAD_MAX_BYTES` | `5242880` | Maximum bytes per uploaded file |
-| `PAKE_UPLOAD_MAX_DOCUMENTS` | `100` | Maximum documents in the shared upload library |
-| `PAKE_UPLOAD_MAX_CHUNKS` | `2000` | Maximum uploaded chunks across the library |
+| `PAKE_UPLOAD_MAX_DOCUMENTS` | `100` | Maximum documents per workspace |
+| `PAKE_UPLOAD_MAX_CHUNKS` | `2000` | Maximum active chunks per workspace |
 
 ## Repository structure
 
@@ -320,7 +327,8 @@ Git; only placeholder values belong in `.env.example`.
 backend/
   app/
     config.py       # Typed environment configuration
-    documents/      # Validated uploads, duplicate detection, and SQLite document library
+    documents/      # Legacy document library and shared validation
+    workspaces/     # Accounts, authorization, source parsing, durable queue, and isolated RAG
     observability/  # Structured system traces and bounded in-process storage
     embeddings/     # Sentence embedding boundary and implementation
     evaluation/     # Query labels, quality metrics, and performance benchmarks
@@ -330,7 +338,8 @@ backend/
     rag/            # Context budgeting, grounded prompts, citations, and answer service
     retrieval/      # Qdrant, BM25, RRF, hybrid search, and reranking
 data/raw/           # Versioned NovaStack demonstration knowledge base
-data/uploads/       # Persistent uploaded documents and chunks (ignored by Git)
+data/uploads/       # Preserved legacy shared library (ignored by Git)
+data/workspaces/    # Private accounts, documents, jobs, and indexes (ignored by Git)
 data/evaluation/    # Human-reviewable and resolved retrieval relevance labels
 scripts/            # Reproducible CLI and experiment runners
 docs/               # Decisions and measured engineering reports

@@ -1,5 +1,10 @@
 # Grounded RAG (Stages 13–16)
 
+> The production API now uses email/password accounts, workspace authorization, asynchronous
+> document processing, PDF/DOCX sources, and versioned document management. See the
+> [current workspace contract](workspaces.md). Shared API examples below describe the earlier
+> implementation/benchmark harness and are not an unauthenticated production endpoint.
+
 The grounded RAG layer converts ranked retrieval results into answers that can be audited
 and safely rejected. It runs entirely on local models by default and does not require an
 external AI API key.

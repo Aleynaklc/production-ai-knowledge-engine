@@ -23,6 +23,9 @@ class ContextSource(BaseModel):
     retrieval_rank: int = Field(ge=1)
     token_count: int = Field(ge=1)
     truncated: bool = False
+    document_version: int | None = None
+    source_unit: int | None = None
+    source_kind: str | None = None
 
 
 class ContextBundle(BaseModel):
@@ -143,6 +146,21 @@ class ContextBuilder:
                     retrieval_rank=result.rank,
                     token_count=source_tokens,
                     truncated=truncated,
+                    document_version=(
+                        int(value)
+                        if isinstance(value := result.chunk.metadata.get("document_version"), int)
+                        else None
+                    ),
+                    source_unit=(
+                        int(value)
+                        if isinstance(value := result.chunk.metadata.get("source_unit"), int)
+                        else None
+                    ),
+                    source_kind=(
+                        value
+                        if isinstance(value := result.chunk.metadata.get("source_kind"), str)
+                        else None
+                    ),
                 )
             )
             rendered_blocks.append(rendered)
