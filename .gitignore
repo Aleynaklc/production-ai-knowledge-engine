@@ -41,3 +41,6 @@ models/
 
 # Keep future data directories in Git with placeholder files.
 !data/processed/.gitkeep
+
+# Generated evaluation artifacts
+/evaluation/reports/
