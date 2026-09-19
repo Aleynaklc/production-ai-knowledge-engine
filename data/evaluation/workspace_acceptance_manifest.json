@@ -1,0 +1,7 @@
+{
+  "dataset_sha256": "c108baef14afb87b860950dabcc847eee27a6c9b597117f39a863dfcfebaf840",
+  "query_count": 24,
+  "answerable_count": 18,
+  "frozen_before": "section boundary and relative-reranker-window experiments",
+  "policy": "Do not edit labels or tune individual production rules from acceptance failures. Future tuning requires a fresh acceptance set. This synthetic set is authored by the same developer, not an external blind benchmark."
+}

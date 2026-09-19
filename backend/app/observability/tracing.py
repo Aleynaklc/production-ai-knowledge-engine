@@ -53,16 +53,28 @@ def build_system_trace(answer: RAGAnswer, request_id: str) -> SystemTrace:
                 summary=(
                     f"Generated {answer.output_tokens} output tokens."
                     if generated
+                    else "Computed quantity × unit price from a source table; no model generation."
+                    if answer.calculation is not None
+                    else "Selected verbatim source excerpts; no model generation."
+                    if answer.extraction is not None
                     else "Generation was skipped by the evidence gate."
                 ),
                 metrics={
                     "input_tokens": answer.input_tokens,
                     "output_tokens": answer.output_tokens,
+                    **(
+                        {"provider": answer.generation_provider}
+                        if answer.generation_provider
+                        else {}
+                    ),
+                    **({"model": answer.generation_model} if answer.generation_model else {}),
                 },
             ),
             TraceStage(
                 name="grounding",
-                status="completed" if generated else "skipped",
+                status="completed"
+                if generated or answer.calculation is not None or answer.extraction is not None
+                else "skipped",
                 duration_ms=answer.timings.grounding_ms,
                 summary=(
                     (
@@ -70,7 +82,7 @@ def build_system_trace(answer: RAGAnswer, request_id: str) -> SystemTrace:
                         if answer.validation.valid
                         else "Grounding validation prevented an unsafe answer."
                     )
-                    if generated
+                    if generated or answer.calculation is not None or answer.extraction is not None
                     else "Grounding was skipped because generation did not run."
                 ),
                 metrics={

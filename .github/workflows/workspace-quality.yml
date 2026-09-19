@@ -1,0 +1,45 @@
+name: Workspace model quality
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-domain-evaluation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dataset: workspace_scenarios
+            reference: workspace_scenarios_v6
+          - dataset: workspace_acceptance
+            reference: acceptance_before
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install Python
+        run: uv python install 3.12
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+      - name: Verify frozen acceptance labels
+        run: uv run pytest tests/evaluation/test_workspace_scenarios.py
+      - name: Evaluate real models against all synthetic scenarios
+        run: uv run python -m scripts.evaluate_workspaces --variant current --enforce --dataset data/evaluation/${{ matrix.dataset }}.json --output evaluation/reports/${{ matrix.dataset }}_ci.json
+      - name: Reject regressions against the reference run
+        run: uv run python -m scripts.compare_workspace_reports evaluation/reports/${{ matrix.reference }}.json evaluation/reports/${{ matrix.dataset }}_ci.json
+      - name: Save the report even when the quality gate fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-model-quality-${{ matrix.dataset }}
+          path: evaluation/reports/${{ matrix.dataset }}_ci.json
+          if-no-files-found: warn
+          retention-days: 14

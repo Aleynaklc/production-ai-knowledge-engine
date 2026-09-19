@@ -16,7 +16,10 @@ def main() -> None:
 
     payload = json.loads(sys.stdin.read())
     settings = Settings(
-        upload_max_expanded_bytes=payload["max_bytes"], upload_max_pages=payload["max_pages"]
+        upload_max_expanded_bytes=payload["max_bytes"],
+        upload_max_pages=payload["max_pages"],
+        upload_ocr_enabled=payload.get("ocr_enabled", True),
+        upload_ocr_languages=payload.get("ocr_languages", "eng"),
     )
     try:
         units = extract_in_process(payload["filename"], base64.b64decode(payload["data"]), settings)

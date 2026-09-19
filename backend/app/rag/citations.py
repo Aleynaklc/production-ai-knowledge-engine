@@ -5,12 +5,13 @@ import re
 from pydantic import BaseModel, ConfigDict
 
 from backend.app.rag.context import ContextBundle
+from backend.app.rag.evidence import factual_evidence
 from backend.app.rag.prompt import INSUFFICIENT_CONTEXT_RESPONSE
 
 CITATION_PATTERN = re.compile(r"\[S([1-9][0-9]*)\]")
 SENTENCE_PATTERN = re.compile(r"(?<=[.!?])(?:\s+|$)|\n+")
 TOKEN_PATTERN = re.compile(r"[^\W_]+")
-NUMBER_PATTERN = re.compile(r"\b\d+(?::\d+)?\b")
+NUMBER_PATTERN = re.compile(r"(?<!\w)[+-]?\d+(?::\d+|\.\d+)?\b")
 STOPWORDS = {
     "a",
     "an",
@@ -74,14 +75,31 @@ def _claims(answer: str) -> list[str]:
 
 
 def _content_tokens(text: str) -> set[str]:
-    return {token for token in TOKEN_PATTERN.findall(text.casefold()) if token not in STOPWORDS}
+    words = NUMBER_PATTERN.sub(" ", text.casefold())
+    return {
+        token for token in TOKEN_PATTERN.findall(words) if token not in STOPWORDS
+    } | number_tokens(text)
+
+
+def number_tokens(text: str) -> set[str]:
+    """Compare numeric spellings exactly, allowing trailing decimal zeros only.
+
+    Do not round, infer units, or turn clock values into decimal quantities.
+    Comma-separated and locale-specific formats are intentionally not converted.
+    """
+    result: set[str] = set()
+    for number in NUMBER_PATTERN.findall(text):
+        if ":" not in number and "." in number:
+            number = number.rstrip("0").rstrip(".")
+        result.add(number)
+    return result
 
 
 def _claim_is_supported(claim: str, context: ContextBundle) -> bool:
     citation_ids = extract_citation_ids(claim)
     source_by_id = {source.citation_id: source for source in context.sources}
     evidence = " ".join(
-        source_by_id[citation_id].text
+        factual_evidence(source_by_id[citation_id].text)
         for citation_id in citation_ids
         if citation_id in source_by_id
     )
@@ -89,8 +107,8 @@ def _claim_is_supported(claim: str, context: ContextBundle) -> bool:
     claim_tokens = _content_tokens(plain_claim)
     if not claim_tokens or not evidence:
         return False
-    claim_numbers = set(NUMBER_PATTERN.findall(plain_claim))
-    evidence_numbers = set(NUMBER_PATTERN.findall(evidence))
+    claim_numbers = number_tokens(plain_claim)
+    evidence_numbers = number_tokens(evidence)
     if not claim_numbers.issubset(evidence_numbers):
         return False
     evidence_tokens = _content_tokens(evidence)

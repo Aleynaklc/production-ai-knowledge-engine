@@ -50,6 +50,53 @@ Neither bundled benchmark documents nor the former shared library enter a worksp
 
 ## Document lifecycle and queue
 
+### Reading and answering
+
+All questions go through document retrieval. Explicit code-example and ordered-procedure
+requests can return verified source excerpts; supported quantity × unit-price requests use
+Decimal arithmetic with recorded operands. Other requests use generation. These routes
+operate on retrieved content and do not map individual questions to prewritten answers. Dense and lexical retrieval find candidates, and the cross-encoder ranks them. Its
+raw scores are not calibrated probabilities: a relevant passage can score below zero. The
+old `0.8` pre-generation cutoff is therefore disabled by default. Remove an existing
+`PAKE_RAG_MIN_RETRIEVAL_SCORE=0.8` override to adopt this behavior; set a cutoff only after
+calibrating it on your own corpus.
+
+Workspace retrieval uses Unicode/diacritic-normalized lexical tokens, document names, and
+inherited Markdown section headings. Document-name tokens provide a recall hint without excluding other documents. The console
+provides explicit document selection; API clients can send `document_ids` with a question.
+The server checks each selected document against the authorized workspace before retrieval
+and separates selected-document cache entries from whole-workspace answers. General example, overview,
+and comparison requests select distinct sections; example requests prioritize concrete
+example/code passages over introduction/index sections. These categories affect retrieval; the separate excerpt route can copy requested examples
+or steps directly from the selected evidence. The approach is heuristic and is not a general semantic query planner.
+
+Selected excerpts are presented in document order, within a 1,600-token context budget and
+up to 20 source blocks (still bounded by retrieval `top_k`). The workspace prompt asks the
+model to read them and produce a short answer, rather than simultaneously format citations.
+The application matches each generated claim to up to three supporting excerpts, requires
+strong lexical coverage, matching numbers, and consistency of capitalized names/terms, then runs the existing citation validator.
+Output that exhausts the generation budget is rejected or uses the existing verified extractive fallback.
+Unmatched claims are rejected; absent information can still produce an abstention. This is
+a lexical safeguard, not a semantic entailment guarantee. Original model output remains in
+`raw_answer` for generated answers (null for calculation/excerpt routes); successful answers carry the usual source/page/version links.
+
+The model remains Qwen2.5-0.5B-Instruct. The larger context and 320-token output ceiling can
+increase uncached latency. Very short or ambiguous questions, paraphrases across languages,
+and difficult summaries remain limited by this small model. Large libraries are searched
+through retrieved excerpts, not exhaustively read on every question. A question such as
+“who is she” has no conversation history to disambiguate multiple people across documents.
+The benchmark/legacy service retains its inline-citation prompt unless explicitly constructed
+with `attribute_sources=True`.
+
+Responses also expose `retrieved_sources` separately from verified `citations`, and an
+`outcome_reason` distinguishing absent evidence, an abstention, a failed verification, and
+exhausted generation length. The console shows passages reviewed and verified citations
+separately. When an answer fails, authorized source previews remain available and are
+explicitly labeled as retrieved passages, not a verified answer.
+
+For broad real-model regression coverage and the current quality limitations, see
+[Cross-domain workspace evaluation](workspace-quality.md).
+
 `POST /api/v1/documents?filename=...` and `PUT /api/v1/documents/{id}?filename=...`
 accept bounded raw file bytes and return **202** with a `processing` record. Admission checks
 (filename, extension, byte quota, document/version quotas, membership) happen immediately.
@@ -82,17 +129,40 @@ stored version chunks during preparation. Model weights are preloaded before acc
 by default. Run **one API process per workspaces directory**; an exclusive process lock enforces
 this for the local queue and Qdrant storage. This implementation targets macOS and Linux.
 
+### Chunk boundaries and index migration
+
+Workspace chunks obey both generator and embedding token budgets. Long prose uses overlap;
+code fences are kept whole where possible and oversized code is split into fenced fragments.
+Fragments are evidence, not promised executable programs. Table fragments repeat their column
+header. Atomic block boundaries can omit prose overlap; adjacent chunks in the same document,
+version, page and section can be joined for context, with `supporting_chunk_ids` retaining lineage.
+Very long questions and generation inputs exceeding model capacity fail explicitly instead
+of silently truncating. Context can still omit evidence when its configured budget is exhausted.
+
+Chunks store a versioned ingestion profile. On startup, ready documents with an older profile
+are queued for replacement from their saved original bytes. The previous active version stays
+available until publication succeeds, which invalidates cached answers. This consumes a document
+version; documents already at the configured version limit are not automatically migrated.
+Changing parser/chunker behavior requires bumping the profile version. The dated audit and older
+chunking benchmark reports describe their original runs, not these new indexes.
+
 ## PDF, DOCX, and source inspection
 
-- PDF extraction preserves physical page numbers; chunks do not cross page boundaries.
-- DOCX extracts body paragraphs and tables in order. Locations are numbered sections, not
-  fabricated page numbers. Headers, footers, images, and embedded objects are not indexed.
+- PDF uses layout extraction to improve reading order and preserves physical page numbers;
+  chunks do not cross page boundaries. Complex layouts can still need manual review.
+- DOCX groups body paragraphs under headings and extracts simple tables, headers and footers.
+  Locations are numbered sections, not fabricated pages. Text boxes, nested tables, footnotes,
+  images and embedded objects are not comprehensively supported.
 - Markdown/text remain UTF-8 sources. Their preview is one source section.
 - Citation responses include `document_version`, `source_unit`, and `source_kind`.
   **Open page/section** shows the extracted evidence; **Download original** retrieves the
   exact authenticated source bytes for that version.
-- OCR is not included. Image-only PDF files fail with an actionable OCR message. Text-bearing
-  PDFs with individual blank/image pages retain those page positions in the source viewer.
+- Image-only PDF pages use local OCR when `PAKE_UPLOAD_OCR_ENABLED=true`. Install Poppler
+  (`pdftoppm`) and Tesseract on the API host. The default language is `eng`; `eng+tur` requires
+  both language packs installed locally. Missing tools or failed extraction produce an actionable
+  processing error. OCR quality depends on the scan and is not guaranteed. Each subprocess
+  has a 15-second limit, and the whole-document parser limits below still apply; long scanned
+  documents may exceed them. Blank pages retain their physical positions.
 - PDF/DOCX parsing runs in a separate subprocess with a 30-second wall timeout and 20-second
   CPU limit. Linux workers also have a 512 MiB address-space limit. Extracted text, PDF page
   count, PDF page streams, and DOCX ZIP expansion have configured limits. These bounds do
@@ -140,6 +210,11 @@ stored normalized text rather than original file bytes, so those imported origin
 saved text. Restart/start the API to process jobs. Repeated imports deduplicate identical text.
 
 ## Verification
+
+Generation automatically uses OpenAI when the backend has `OPENAI_API_KEY`; otherwise
+it uses the existing local model. Workspace authorization, indexing, and source
+validation apply to both modes. See [generation providers](generation-providers.md)
+for setup, provider errors, and which data is sent to the API.
 
 `tests/test_workspaces.py` exercises the production app with isolated temporary stores and
 small deterministic model adapters. It covers two-company answers and caches, foreign-source

@@ -8,15 +8,18 @@ from pathlib import Path
 from threading import Event
 from time import monotonic, sleep
 
+import httpx
 import pytest
 from docx import Document
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
 from backend.app.config import Settings
 from backend.app.documents.library import DocumentUploadError
 from backend.app.llm.generation import GenerationOptions, GenerationResult
+from backend.app.rag.remote import OpenAIGroundedGenerator
 from backend.app.workspaces.api import create_app
 from backend.app.workspaces.engine import SharedModels, WorkspaceManager
 from backend.app.workspaces.parsing import SourceUnit, extract
@@ -115,6 +118,74 @@ def api(tmp_path: Path) -> Iterator[tuple[TestClient, WorkspaceManager, Embeddin
 
 type API = tuple[TestClient, WorkspaceManager, Embedding, Generator]
 QUESTION = {"question": "What is the access code?"}
+
+
+def test_remote_errors_are_not_cached_and_success_keeps_sources(api: API) -> None:
+    client, manager, _, _ = api
+    actor = register(client, "remote@example.com")
+    document = upload(client, actor, b"Access code is SILVER-44.")
+    wait_document(client, actor, document)
+    calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        if len(calls) == 1:
+            return httpx.Response(401, json={"error": {"message": "test-secret-private"}})
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "output": [
+                    {
+                        "type": "message",
+                        "role": "assistant",
+                        "content": [
+                            {
+                                "type": "output_text",
+                                "text": (
+                                    "Access code is SILVER-44 [S1]."
+                                    if len(calls) == 2
+                                    else "Access code is INVENTED-999 [S1]."
+                                ),
+                            }
+                        ],
+                    }
+                ],
+                "usage": {"input_tokens": 87, "output_tokens": 13},
+            },
+        )
+
+    engine = manager.engine(actor.workspace)
+    assert engine.service is not None
+    engine.service.generator = OpenAIGroundedGenerator(
+        SecretStr("test-secret-private"),
+        "gpt-4.1-mini",
+        GenerationOptions(do_sample=False),
+        transport=httpx.MockTransport(handler),
+    )
+    failure = client.post("/api/v1/answers", json=QUESTION, headers=actor.headers)
+    assert failure.status_code == 503
+    assert failure.json()["error"]["code"] == "generation_auth_failed"
+    assert "test-secret-private" not in failure.text
+    success = client.post("/api/v1/answers", json=QUESTION, headers=actor.headers)
+    assert success.status_code == 200, success.text
+    result = success.json()["result"]
+    assert result["generation_provider"] == "openai"
+    assert result["generation_model"] == "gpt-4.1-mini"
+    assert result["input_tokens"] == 87 and result["output_tokens"] == 13
+    assert "SILVER-44" in result["answer"] and result["citations"]
+    cached = client.post("/api/v1/answers", json=QUESTION, headers=actor.headers).json()["result"]
+    assert cached["cache_hit"] and cached["generation_provider"] == "openai"
+    assert len(calls) == 2
+    # A successful HTTP response is still subject to the same grounding checks.
+    unsupported = client.post(
+        "/api/v1/answers",
+        json={"question": "Please tell me the access code."},
+        headers=actor.headers,
+    ).json()["result"]
+    assert len(calls) == 3
+    assert "INVENTED-999" not in unsupported["answer"]
+    assert unsupported["status"] != "answered" or unsupported["fallback_used"]
 
 
 def upload(client: TestClient, actor: Actor, text: bytes, filename: str = "guide.txt") -> str:
@@ -499,3 +570,59 @@ def test_only_one_worker_can_own_the_workspace_directory(api: API) -> None:
             other.start()
     finally:
         other.close()
+
+
+def test_explicit_document_scope_and_cache_are_workspace_bound(api: API) -> None:
+    client, _, _, _ = api
+    actor = register(client, "scope-a@example.com")
+    one = upload(client, actor, b"Access code is ALPHA-111.", "first.txt")
+    two = upload(client, actor, b"Access code is BETA-222.", "second.txt")
+    wait_document(client, actor, one)
+    wait_document(client, actor, two)
+    question = "What is the access code?"
+    for document_id, expected in [(one, "ALPHA-111"), (two, "BETA-222")]:
+        result = client.post(
+            "/api/v1/answers",
+            headers=actor.headers,
+            json={"question": question, "document_ids": [document_id]},
+        ).json()["result"]
+        assert expected in result["answer"]
+        assert {source["document_id"] for source in result["retrieved_sources"]} == {document_id}
+    other = register(client, "scope-b@example.com")
+    foreign = upload(client, other, b"Access code is GAMMA-333.", "third.txt")
+    wait_document(client, other, foreign)
+    denied = client.post(
+        "/api/v1/answers",
+        headers=actor.headers,
+        json={"question": question, "document_ids": [foreign]},
+    )
+    assert denied.status_code == 404
+
+
+def test_reindex_profile_queues_a_new_version_and_preserves_old_sources(api: API) -> None:
+    import json
+
+    client, manager, _, _ = api
+    actor = register(client, "reindex@example.com")
+    document_id = upload(client, actor, b"Access code is OLD-111.", "policy.txt")
+    wait_document(client, actor, document_id)
+    store = manager.store(actor.workspace)
+    assert store.schedule_reindex() == 0
+    with store.connect() as db:
+        row = db.execute(
+            "SELECT chunks FROM versions WHERE document_id=? AND version=1", (document_id,)
+        ).fetchone()
+        chunks = json.loads(row[0])
+        for chunk in chunks:
+            chunk["metadata"].pop("ingestion_profile")
+        db.execute(
+            "UPDATE versions SET chunks=? WHERE document_id=? AND version=1",
+            (json.dumps(chunks), document_id),
+        )
+    assert store.schedule_reindex() == 1
+    assert store.schedule_reindex() == 0
+    manager.wake.set()
+    record = wait_document(client, actor, document_id)
+    assert record["active_version"] == 2
+    assert store.source(document_id, 1)[1] == b"Access code is OLD-111."
+    assert store.schedule_reindex() == 0

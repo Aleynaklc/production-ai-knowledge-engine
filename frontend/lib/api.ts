@@ -46,6 +46,8 @@ export interface SystemTrace {
 }
 
 export interface AnswerResult {
+  extraction?: { kind: string; excerpts: { citation_id: string; text: string }[] } | null;
+  calculation?: { operation: string; item: string; quantity: string; unit_price: string; result: string; citation_id: string; source_row: string } | null;
   cache_hit: boolean;
   question: string;
   status: RagStatus;
@@ -53,6 +55,13 @@ export interface AnswerResult {
   raw_answer: string | null;
   fallback_used: boolean;
   citations: AnswerCitation[];
+  retrieved_sources?: AnswerCitation[];
+  outcome_reason?:
+    | 'no_evidence'
+    | 'not_in_sources'
+    | 'verification_failed'
+    | 'generation_limit'
+    | null;
   validation: {
     valid: boolean;
     abstained: boolean;
@@ -73,6 +82,8 @@ export interface AnswerResult {
   };
   input_tokens: number;
   output_tokens: number;
+  generation_provider?: 'local' | 'openai' | null;
+  generation_model?: string | null;
 }
 
 export interface AnswerResponse {
@@ -86,7 +97,9 @@ export interface SystemResponse {
   service: string;
   environment: string;
   api_version: string;
-  inference: 'local';
+  inference: 'local' | 'openai';
+  provider_selection: 'auto' | 'local' | 'openai';
+  server_api_key_configured: boolean;
   model: string;
   retrieval: string;
   api_key_required: false;
@@ -168,11 +181,14 @@ export function getSystem(): Promise<SystemResponse> {
   return apiFetch<SystemResponse>('/api/v1/system');
 }
 
-export function askKnowledgeEngine(question: string): Promise<AnswerResponse> {
+export function askKnowledgeEngine(
+  question: string,
+  documentIds: string[] = [],
+): Promise<AnswerResponse> {
   return apiFetch<AnswerResponse>('/api/v1/answers', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, document_ids: documentIds }),
   });
 }
 

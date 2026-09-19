@@ -1,0 +1,76 @@
+--- a/backend/app/ingestion/chunkers.py
++++ b/backend/app/ingestion/chunkers.py
+@@ -189,6 +189,9 @@
+                     current = []
+                     fence = ""
+                     continue
++            if not fence and re.match(r"^ {0,3}#{1,6}\s+", line) and current:
++                blocks.append("\n".join(current).strip())
++                current = []
+             if not fence and not line.strip():
+                 if current:
+                     blocks.append("\n".join(current).strip())
+@@ -203,6 +206,18 @@
+         chunks: list[str] = []
+         current = ""
+         for block in self._blocks(text):
++            # A new section is a semantic boundary even when both fit in the budget.
++            # Do not carry prose from another section into this one as overlap.
++            if (
++                re.match(r"^#{1,6}\s+", block)
++                and current
++                and any(
++                    line.strip() and not re.match(r"^#{1,6}\s+", line)
++                    for line in current.splitlines()
++                )
++            ):
++                chunks.append(current)
++                current = ""
+             candidate = f"{current}\n\n{block}".strip()
+             if self.codec.count(candidate) <= self.chunk_size:
+                 current = candidate
+--- a/backend/app/retrieval/workspace.py
++++ b/backend/app/retrieval/workspace.py
+@@ -87,7 +87,7 @@
+                 if siblings
+                 else ""
+             )
+-            heading = headings[0].strip() if headings else previous
++            heading = headings[-1].strip() if headings else previous
+             enriched = chunk.model_copy(
+                 update={
+                     "metadata": {
+--- a/backend/app/workspaces/store.py
++++ b/backend/app/workspaces/store.py
+@@ -33,7 +33,7 @@
+         }
+     )
+     return hashlib.sha256(
+-        ("layout-structure-v2:" + json.dumps(values, sort_keys=True)).encode()
++        ("section-boundaries-v3:" + json.dumps(values, sort_keys=True)).encode()
+     ).hexdigest()
+ 
+ 
+--- a/tests/ingestion/test_structure.py
++++ b/tests/ingestion/test_structure.py
+@@ -46,3 +46,20 @@
+     chunks = FixedTokenChunker(BoundaryCodec(), 5, 1).chunk("one two three four five six seven")
+     assert all(BoundaryCodec().count(chunk) <= 5 for chunk in chunks)
+     assert set(" ".join(chunks).split()) == set("one two three four five six seven".split())
++
++
++def test_new_headings_never_copy_facts_from_the_previous_section() -> None:
++    text = "# Guide\n## Cedar\nCedar costs 17 credits.\n## Birch\nBirch costs 29 credits."
++    chunks = RecursiveChunker(WordCodec(), 100, 10).chunk(text)
++    assert len(chunks) == 2
++    assert "17" in chunks[0] and "29" not in chunks[0]
++    assert "29" in chunks[1] and "17" not in chunks[1]
++    assert "## Birch" in chunks[1]
++
++
++def test_markdown_like_comments_inside_code_do_not_start_sections() -> None:
++    code = "```python\n# First comment\nx = 1\n# Second comment\ny = 2\n```"
++    text = "## Example\n" + code + "\n## Notes\nDo not execute unknown code."
++    chunks = RecursiveChunker(WordCodec(), 100, 10).chunk(text)
++    assert len(chunks) == 2 and code in chunks[0]
++    assert "unknown" not in chunks[0]

@@ -21,25 +21,27 @@ from backend.app.ingestion.chunkers import (
     FixedTokenChunker,
     HuggingFaceTokenCodec,
     RecursiveChunker,
+    SharedTokenBudget,
     TokenCodec,
 )
 from backend.app.ingestion.models import DocumentChunk
-from backend.app.llm.generation import GenerationOptions, GenerationResult
+from backend.app.llm.generation import ContextWindowExceeded, GenerationOptions, GenerationResult
 from backend.app.llm.model import load_runtime
+from backend.app.llm.tokenizer import load_tokenizer
 from backend.app.observability.store import TraceStore
 from backend.app.rag.cache import AnswerCache
 from backend.app.rag.context import ContextBuilder
 from backend.app.rag.fallback import ExtractiveFallback
 from backend.app.rag.generator import GroundedGenerator, LocalGroundedGenerator
 from backend.app.rag.models import RAGAnswer, RAGTiming
+from backend.app.rag.remote import GenerationProviderError, OpenAIGroundedGenerator
 from backend.app.rag.service import RAGService
-from backend.app.retrieval.dense import QdrantDenseRetriever
-from backend.app.retrieval.hybrid import HybridRetriever
-from backend.app.retrieval.reranker import CrossEncoderScorer, PairScorer, RerankedRetriever
-from backend.app.retrieval.sparse import BM25Retriever
+from backend.app.retrieval.dense import QdrantDenseRetriever, ScopedDenseRetriever
+from backend.app.retrieval.reranker import CrossEncoderScorer, PairScorer
+from backend.app.retrieval.workspace import WorkspaceRetriever
 from backend.app.workspaces.auth import AccountStore
 from backend.app.workspaces.parsing import extract
-from backend.app.workspaces.store import WorkspaceStore
+from backend.app.workspaces.store import WorkspaceStore, ingestion_profile
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +61,16 @@ class LockedEmbedder:
 
     def embed_query(self, text: str) -> list[float]:
         with self.lock:
+            if (
+                isinstance(self.base, SentenceTransformerEmbedder)
+                and len(self.base.tokenizer.encode(text, add_special_tokens=False))
+                > self.base.max_content_tokens
+            ):
+                raise DocumentUploadError(
+                    "question_too_long",
+                    "Shorten the question to fit the search model's token limit.",
+                    422,
+                )
             return self.base.embed_query(text)
 
 
@@ -88,6 +100,8 @@ class SharedModels:
     scorer: PairScorer
     generator: GroundedGenerator
     codec: TokenCodec
+    chunk_codec: TokenCodec | None = None
+    chunk_token_limit: int | None = None
 
     @classmethod
     def load(cls, settings: Settings) -> "SharedModels":
@@ -101,21 +115,35 @@ class SharedModels:
             settings.reranker_model_revision,
             settings.retrieval_device,
         )
-        runtime = load_runtime(settings.model_name, settings.model_revision, settings.device)
+        options = GenerationOptions(
+            do_sample=False, max_new_tokens=settings.rag_max_new_tokens, repetition_penalty=1.05
+        )
+        generator: GroundedGenerator
+        if settings.effective_generation_provider == "openai":
+            assert settings.openai_api_key is not None
+            generator = OpenAIGroundedGenerator(
+                settings.openai_api_key,
+                settings.openai_model,
+                options,
+                timeout_seconds=settings.openai_timeout_seconds,
+            )
+            # Keep ingestion identical across providers; only the tokenizer is
+            # needed for local context estimates, never the local generator weights.
+            tokenizer = load_tokenizer(settings.model_name, settings.model_revision)
+        else:
+            runtime = load_runtime(settings.model_name, settings.model_revision, settings.device)
+            tokenizer = runtime.tokenizer
+            generator = LocalGroundedGenerator(runtime, options)
         return cls(
             LockedEmbedder(embedding),
             LockedScorer(scorer),
-            LockedGenerator(
-                LocalGroundedGenerator(
-                    runtime,
-                    GenerationOptions(
-                        do_sample=False,
-                        max_new_tokens=settings.rag_max_new_tokens,
-                        repetition_penalty=1.05,
-                    ),
-                )
+            LockedGenerator(generator),
+            HuggingFaceTokenCodec(tokenizer),
+            SharedTokenBudget(
+                HuggingFaceTokenCodec(tokenizer),
+                HuggingFaceTokenCodec(embedding.tokenizer),
             ),
-            HuggingFaceTokenCodec(runtime.tokenizer),
+            embedding.max_content_tokens,
         )
 
 
@@ -175,20 +203,26 @@ class WorkspaceEngine:
         if not chunks:
             self.service = None
             return
-        hybrid = HybridRetriever(
-            self.dense, BM25Retriever(chunks), self.settings.retrieval_candidate_k
-        )
         self.service = RAGService(
-            RerankedRetriever(hybrid, self.shared.scorer, self.settings.retrieval_candidate_k),
+            WorkspaceRetriever(
+                self.dense,
+                chunks,
+                self.shared.scorer,
+                self.settings.retrieval_candidate_k,
+                score_gap=self.settings.rag_rerank_score_gap,
+            ),
             ContextBuilder(
                 self.shared.codec,
                 token_budget=self.settings.rag_context_tokens,
                 max_sources=self.settings.rag_max_sources,
+                preserve_document_order=True,
+                reading_format=True,
             ),
             self.shared.generator,
             default_top_k=self.settings.rag_top_k,
             strict_grounding=self.settings.rag_strict_grounding,
             minimum_retrieval_score=self.settings.rag_min_retrieval_score,
+            attribute_sources=True,
             extractive_fallback=ExtractiveFallback(
                 self.shared.scorer, minimum_score=self.settings.rag_extractive_fallback_score
             ),
@@ -209,7 +243,9 @@ class WorkspaceEngine:
         self._set_service(revision, chunks)
         self.healthy = True
 
-    def answer(self, question: str, top_k: int | None = None) -> RAGAnswer:
+    def answer(
+        self, question: str, top_k: int | None = None, *, document_ids: list[str] | None = None
+    ) -> RAGAnswer:
         started = perf_counter()
         question = question.strip()
         depth = self.settings.rag_top_k if top_k is None else top_k
@@ -224,7 +260,15 @@ class WorkspaceEngine:
                     "No indexed documents yet. Wait for a document to become ready.",
                     409,
                 )
-            key = (self.revision, question, depth)
+            selected_ids = sorted(set(document_ids or []))
+            for document_id in selected_ids:
+                self.store.get(document_id)  # Validate within this authorized workspace.
+            scope_key = hashlib.sha256(json.dumps(selected_ids).encode()).hexdigest()
+            provider_key = (
+                f"{self.settings.effective_generation_provider}:{self.settings.generation_model}:"
+                f"{self.settings.model_revision}:{self.settings.rag_max_new_tokens}"
+            )
+            key = (self.revision + scope_key + provider_key, question, depth)
             cached = self.cache.get(key)
             if cached:
                 return cached.model_copy(
@@ -241,7 +285,36 @@ class WorkspaceEngine:
                         ),
                     }
                 )
-            answer = self.service.answer(question, depth)
+            service = self.service
+            if selected_ids:
+                _, chunks, _ = self.store.snapshot()
+                scoped_chunks = [chunk for chunk in chunks if chunk.document_id in selected_ids]
+                if not scoped_chunks:
+                    raise DocumentUploadError(
+                        "documents_not_ready", "Selected documents are not indexed yet.", 409
+                    )
+                service = RAGService(
+                    WorkspaceRetriever(
+                        ScopedDenseRetriever(self.dense, selected_ids),
+                        scoped_chunks,
+                        self.shared.scorer,
+                        self.settings.retrieval_candidate_k,
+                        score_gap=self.settings.rag_rerank_score_gap,
+                    ),
+                    self.service.context_builder,
+                    self.shared.generator,
+                    default_top_k=self.settings.rag_top_k,
+                    strict_grounding=self.settings.rag_strict_grounding,
+                    minimum_retrieval_score=self.settings.rag_min_retrieval_score,
+                    attribute_sources=True,
+                    extractive_fallback=self.service.extractive_fallback,
+                )
+            try:
+                answer = service.answer(question, depth)
+            except ContextWindowExceeded as error:
+                raise DocumentUploadError("context_too_long", str(error), 422) from error
+            except GenerationProviderError as error:
+                raise DocumentUploadError(error.code, error.message, error.status_code) from None
             answer = answer.model_copy(
                 update={
                     "timings": answer.timings.model_copy(
@@ -259,10 +332,14 @@ class WorkspaceEngine:
             chunker_class = (
                 FixedTokenChunker if self.settings.chunk_strategy == "fixed" else RecursiveChunker
             )
-            chunker = chunker_class(
-                self.shared.codec,
+            effective_size = min(
                 self.settings.chunk_size_tokens,
-                self.settings.chunk_overlap_tokens,
+                self.shared.chunk_token_limit or self.settings.chunk_size_tokens,
+            )
+            chunker = chunker_class(
+                self.shared.chunk_codec or self.shared.codec,
+                effective_size,
+                min(self.settings.chunk_overlap_tokens, effective_size - 1),
             )
             chunks: list[DocumentChunk] = []
             for unit in units:
@@ -285,6 +362,7 @@ class WorkspaceEngine:
                                 "document_version": version,
                                 "source_unit": unit.number,
                                 "source_kind": unit.kind,
+                                "ingestion_profile": ingestion_profile(self.settings),
                             },
                         )
                     )
@@ -419,6 +497,7 @@ class WorkspaceManager:
                 self.engine(workspace_id)
         for store in self.stores.values():
             store.recover()
+            store.schedule_reindex()
         self.stop.clear()
         self.worker = Thread(target=self._work, name="workspace-ingestion", daemon=True)
         self.worker.start()

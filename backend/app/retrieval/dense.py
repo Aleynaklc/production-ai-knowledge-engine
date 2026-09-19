@@ -66,7 +66,9 @@ class QdrantDenseRetriever:
                 wait=True,
             )
 
-    def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
+    def retrieve(
+        self, query: str, top_k: int = 5, *, document_ids: list[str] | None = None
+    ) -> list[RetrievalResult]:
         """Embed a query and return Qdrant cosine matches."""
 
         if top_k < 1:
@@ -76,6 +78,17 @@ class QdrantDenseRetriever:
             query=self.embedder.embed_query(query),
             limit=top_k,
             with_payload=True,
+            query_filter=(
+                models.Filter(
+                    must=[
+                        models.FieldCondition(
+                            key="document_id", match=models.MatchAny(any=document_ids)
+                        )
+                    ]
+                )
+                if document_ids
+                else None
+            ),
         )
         results: list[RetrievalResult] = []
         points = cast(Sequence[Any], response.points)
@@ -94,3 +107,15 @@ class QdrantDenseRetriever:
                 )
             )
         return results
+
+
+class ScopedDenseRetriever:
+    """Apply an explicit, already-authorized document scope before vector ranking."""
+
+    name = "dense_scoped"
+
+    def __init__(self, base: QdrantDenseRetriever, document_ids: list[str]) -> None:
+        self.base, self.document_ids = base, document_ids
+
+    def retrieve(self, query: str, top_k: int = 5) -> list[RetrievalResult]:
+        return self.base.retrieve(query, top_k, document_ids=self.document_ids)

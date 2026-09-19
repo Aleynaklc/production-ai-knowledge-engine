@@ -1,7 +1,7 @@
 """Autoregressive text generation with explicit sampling controls and metrics."""
 
 from time import perf_counter
-from typing import cast
+from typing import Literal, cast
 
 import torch
 from pydantic import BaseModel, Field
@@ -22,6 +22,10 @@ class GenerationOptions(BaseModel):
     do_sample: bool = True
 
 
+class ContextWindowExceeded(ValueError):
+    """The full chat template plus requested completion cannot fit the model."""
+
+
 class GenerationResult(BaseModel):
     """Generated text plus reproducible performance measurements."""
 
@@ -31,6 +35,8 @@ class GenerationResult(BaseModel):
     generation_seconds: float
     tokens_per_second: float
     options: GenerationOptions
+    provider: Literal["local", "openai"] = "local"
+    model: str | None = None
 
 
 def build_generation_kwargs(
@@ -79,6 +85,14 @@ def generate_text(
 
     inputs = build_chat_inputs(runtime.tokenizer, prompt, system_prompt, runtime.device)
     input_token_count = int(inputs["input_ids"].shape[-1])
+    context_limit = getattr(getattr(runtime.model, "config", None), "max_position_embeddings", None)
+    if (
+        isinstance(context_limit, int)
+        and input_token_count + options.max_new_tokens > context_limit
+    ):
+        raise ContextWindowExceeded(
+            "The question and document context exceed the model's input limit."
+        )
     torch.manual_seed(options.seed)
     generation_kwargs = build_generation_kwargs(
         options,
@@ -108,4 +122,5 @@ def generate_text(
         generation_seconds=round(elapsed, 6),
         tokens_per_second=round(tokens_per_second, 6),
         options=options,
+        model=getattr(runtime, "model_name", None),
     )

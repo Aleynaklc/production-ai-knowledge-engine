@@ -44,6 +44,7 @@ import {
   RagStatus,
   SystemResponse,
   TraceStage,
+  UploadedDocument,
   askKnowledgeEngine,
   getSystem,
 } from '@/lib/api';
@@ -67,7 +68,7 @@ const stageDetails: Record<
 function statusConfig(status: RagStatus) {
   if (status === 'answered') {
     return {
-      label: 'Grounded answer',
+      label: 'Answer with sources',
       className: 'border-mint/30 bg-mint/10 text-mint',
       icon: Check,
     };
@@ -255,6 +256,8 @@ function KnowledgeConsole() {
   const [source, setSource] = useState<SourceLocation | null>(null);
   const [question, setQuestion] = useState(sampleQuestions[0]);
   const [response, setResponse] = useState<AnswerResponse | null>(null);
+  const [documents, setDocuments] = useState<UploadedDocument[]>([]);
+  const [selectedDocument, setSelectedDocument] = useState('');
   const [system, setSystem] = useState<SystemResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, setIsUploading] = useState(false);
@@ -273,7 +276,12 @@ function KnowledgeConsole() {
     setIsLoading(true);
     setError(null);
     try {
-      setResponse(await askKnowledgeEngine(normalizedQuestion));
+      setResponse(
+        await askKnowledgeEngine(
+          normalizedQuestion,
+          selectedDocument ? [selectedDocument] : [],
+        ),
+      );
     } catch (caught) {
       setError(
         caught instanceof Error ? caught.message : 'The answer request failed.',
@@ -283,8 +291,21 @@ function KnowledgeConsole() {
     }
   }
 
-  const status = response ? statusConfig(response.result.status) : null;
+  const baseStatus = response ? statusConfig(response.result.status) : null;
+  const status = baseStatus ? { ...baseStatus, label: response?.result.extraction ? 'Source excerpts' : response?.result.calculation ? 'Calculated from sources' : baseStatus.label } : null;
   const StatusIcon = status?.icon;
+  const citedEvidence = Boolean(response?.result.citations.length);
+  const evidence = response
+    ? citedEvidence
+      ? response.result.citations
+      : (response.result.retrieved_sources ?? [])
+    : [];
+  const answerText =
+    response?.result.outcome_reason === 'generation_limit'
+      ? 'The generated answer reached its length limit and could not be verified. Review the retrieved passages below, or ask about a smaller section.'
+      : response?.result.outcome_reason === 'verification_failed'
+        ? 'I could not verify an answer from the retrieved passages. You can inspect those passages below; they are not presented as a verified answer.'
+        : (response?.result.answer ?? '');
 
   return (
     <main className="min-h-screen overflow-hidden bg-canvas text-ink">
@@ -352,10 +373,42 @@ function KnowledgeConsole() {
               answering={isLoading}
               onBusyChange={setIsUploading}
               onUploaded={() => setResponse(null)}
+              onDocumentsChange={(nextDocuments) => {
+                setDocuments(nextDocuments);
+                if (selectedDocument && !nextDocuments.some((document) => document.id === selectedDocument && document.active_version !== null)) {
+                  setSelectedDocument('');
+                  setResponse(null);
+                }
+              }}
             />
             <Card className="border-white/8 bg-panel/88 ring-0">
               <CardContent className="py-6">
                 <form onSubmit={submit}>
+                  <label
+                    htmlFor="question-document"
+                    className="mb-4 block text-sm text-ink-dim"
+                  >
+                    Search in
+                    <select
+                      id="question-document"
+                      value={selectedDocument}
+                      disabled={isLoading}
+                      onChange={(event) => {
+                        setSelectedDocument(event.target.value);
+                        setResponse(null);
+                      }}
+                      className="mt-2 block w-full rounded-lg border border-white/15 bg-panel p-2 text-ink"
+                    >
+                      <option value="">All workspace documents</option>
+                      {documents
+                        .filter((document) => document.active_version !== null)
+                        .map((document) => (
+                          <option key={document.id} value={document.id}>
+                            {document.filename}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
                   <div className="mb-3 flex items-center justify-between gap-4">
                     <label
                       htmlFor="question"
@@ -452,13 +505,16 @@ function KnowledgeConsole() {
                         <Clock3 className="size-3" />{' '}
                         {response.result.timings.total_ms.toFixed(1)} ms
                       </span>
-                      <span>{response.result.citations.length} sources</span>
+                      <span>
+                        {response.result.context_source_count} passages reviewed
+                        · {response.result.citations.length} citations
+                      </span>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="px-5 py-7 sm:px-7 sm:py-8">
                   <p className="answer-copy whitespace-pre-wrap font-display text-[clamp(1.15rem,2.2vw,1.55rem)] leading-[1.65] tracking-[-0.015em] text-ink">
-                    {renderAnswer(response.result.answer)}
+                    {renderAnswer(answerText)}
                   </p>
                   {response.result.fallback_used ? (
                     <p className="mt-5 flex items-center gap-2 text-xs text-ink-dim">
@@ -470,7 +526,7 @@ function KnowledgeConsole() {
               </Card>
             ) : null}
 
-            {!isLoading && response?.result.citations.length ? (
+            {!isLoading && response && evidence.length ? (
               <section aria-labelledby="sources-heading">
                 {source && (
                   <SourceViewer
@@ -481,14 +537,17 @@ function KnowledgeConsole() {
                 )}
                 <div className="mb-3 flex items-center justify-between">
                   <h2 id="sources-heading" className="eyebrow">
-                    <FileText className="size-3.5" /> Cited evidence
+                    <FileText className="size-3.5" />{' '}
+                    {citedEvidence
+                      ? 'Cited evidence'
+                      : 'Retrieved passages — answer not verified'}
                   </h2>
                   <span className="font-mono text-[10px] text-ink-faint">
                     {response.result.context_token_count} CONTEXT TOKENS
                   </span>
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
-                  {response.result.citations.map((citation) => (
+                  {evidence.map((citation) => (
                     <Card
                       key={citation.citation_id}
                       size="sm"

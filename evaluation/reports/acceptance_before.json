@@ -1,0 +1,1987 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-14T22:24:36.537343+00:00",
+  "dataset_sha256": "c108baef14afb87b860950dabcc847eee27a6c9b597117f39a863dfcfebaf840",
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "model_revision": "c89bee90d9f811437d9735454613c35b4a3c4dc8",
+  "device": "cpu",
+  "context_tokens": 1600,
+  "output_tokens": 320,
+  "notes": "Synthetic documents with stable IDs only. Baseline uses the pre-adaptation retriever with the same current generator/validator. Both variants use Unicode BM25. Sequential requests; no answer cache. Baseline runs first, so latency is descriptive, not a controlled speed comparison. Keyword/citation checks do not establish semantic correctness. Full outputs are retained for review.",
+  "variants": {
+    "current": {
+      "summary": {
+        "query_count": 24,
+        "answerable_count": 18,
+        "answerable_lexical_success_rate": 0.7777777777777778,
+        "unanswerable_count": 6,
+        "unanswerable_false_answers": 0,
+        "mean_retrieval_recall": 1.0,
+        "mean_evidence_span_recall": 1.0,
+        "mean_latency_ms": 841.5151528333333,
+        "by_category": {
+          "conditional": {
+            "count": 1,
+            "passed": 0
+          },
+          "paraphrase": {
+            "count": 2,
+            "passed": 2
+          },
+          "negation": {
+            "count": 2,
+            "passed": 1
+          },
+          "missing": {
+            "count": 6,
+            "passed": 6
+          },
+          "attribute": {
+            "count": 3,
+            "passed": 3
+          },
+          "comparison": {
+            "count": 1,
+            "passed": 1
+          },
+          "cross_language": {
+            "count": 2,
+            "passed": 1
+          },
+          "procedure": {
+            "count": 1,
+            "passed": 1
+          },
+          "identity": {
+            "count": 1,
+            "passed": 1
+          },
+          "multi_attribute": {
+            "count": 1,
+            "passed": 1
+          },
+          "condition": {
+            "count": 1,
+            "passed": 1
+          },
+          "temporal": {
+            "count": 1,
+            "passed": 1
+          },
+          "fact": {
+            "count": 1,
+            "passed": 1
+          },
+          "numeric_lookup": {
+            "count": 1,
+            "passed": 0
+          }
+        },
+        "quality_gate_passed": false,
+        "gate": "At least 80% answerable lexical/citation success and zero false answers on unanswerable cases. This is not a semantic correctness guarantee."
+      },
+      "per_query": [
+        {
+          "scenario": "archive",
+          "query_id": "archive-1",
+          "category": "conditional",
+          "question": "What time does the reading room close on Saturday?",
+          "answerable": true,
+          "passed_lexical_regression": false,
+          "missing_terms": [
+            "14:00"
+          ],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What time does the reading room close on Saturday?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "14:00",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": 10.00672721862793,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": [
+                "quantity_question_not_supported"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 82,
+            "timings": {
+              "retrieval_ms": 290.896125,
+              "context_ms": 0.766291,
+              "generation_ms": 1142.126,
+              "grounding_ms": 0.51575,
+              "total_ms": 1452.559125
+            },
+            "input_tokens": 198,
+            "output_tokens": 6
+          }
+        },
+        {
+          "scenario": "archive",
+          "query_id": "archive-2",
+          "category": "paraphrase",
+          "question": "How far in advance must researchers reserve a desk?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "How far in advance must researchers reserve a desk?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 48 hours before a visit",
+            "raw_answer": "48 hours before a visit",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": 4.564133644104004,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": 4.564133644104004,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 82,
+            "timings": {
+              "retrieval_ms": 16.483667,
+              "context_ms": 0.59875,
+              "generation_ms": 630.563,
+              "grounding_ms": 0.305375,
+              "total_ms": 649.116667
+            },
+            "input_tokens": 198,
+            "output_tokens": 7
+          }
+        },
+        {
+          "scenario": "archive",
+          "query_id": "archive-3",
+          "category": "negation",
+          "question": "Is flash photography permitted?",
+          "answerable": true,
+          "passed_lexical_regression": false,
+          "missing_terms": [
+            "prohibited"
+          ],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Is flash photography permitted?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Yes, flash photography is permitted.",
+            "raw_answer": "Yes, flash photography is permitted.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": 7.12388277053833,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": 7.12388277053833,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 82,
+            "timings": {
+              "retrieval_ms": 14.95675,
+              "context_ms": 0.47975,
+              "generation_ms": 671.981,
+              "grounding_ms": 0.312834,
+              "total_ms": 688.588042
+            },
+            "input_tokens": 193,
+            "output_tokens": 8
+          }
+        },
+        {
+          "scenario": "archive",
+          "query_id": "archive-4",
+          "category": "missing",
+          "question": "How much does a replacement reader card cost?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "How much does a replacement reader card cost?",
+            "cache_hit": false,
+            "status": "abstained",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "I don't have enough information in the provided sources to answer that question.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "b61e1a10-ae29-541c-bb6a-1768db442467",
+                "document_id": "004b17d3-737d-5754-a99f-729fdac39222",
+                "source": "Archive handbook.md",
+                "title": "Archive handbook — Archive visitor handbook",
+                "snippet": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.",
+                "supporting_chunk_ids": [
+                  "b61e1a10-ae29-541c-bb6a-1768db442467"
+                ],
+                "retrieval_score": -11.246997833251953,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "not_in_sources",
+            "validation": {
+              "valid": true,
+              "abstained": true,
+              "cited_source_ids": [],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 82,
+            "timings": {
+              "retrieval_ms": 16.319375,
+              "context_ms": 0.50125,
+              "generation_ms": 1175.956,
+              "grounding_ms": 9.627916,
+              "total_ms": 1203.389417
+            },
+            "input_tokens": 197,
+            "output_tokens": 16
+          }
+        },
+        {
+          "scenario": "nursery",
+          "query_id": "nursery-1",
+          "category": "attribute",
+          "question": "At what temperature should Luma cuttings be kept?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "At what temperature should Luma cuttings be kept?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 18 degrees Celsius",
+            "raw_answer": "18 degrees Celsius",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": 8.094929695129395,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": 8.094929695129395,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 81,
+            "timings": {
+              "retrieval_ms": 15.96675,
+              "context_ms": 0.447125,
+              "generation_ms": 492.946,
+              "grounding_ms": 0.267708,
+              "total_ms": 510.57225
+            },
+            "input_tokens": 198,
+            "output_tokens": 5
+          }
+        },
+        {
+          "scenario": "nursery",
+          "query_id": "nursery-2",
+          "category": "comparison",
+          "question": "Compare the rooting times of Luma and Sora cuttings.",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Compare the rooting times of Luma and Sora cuttings.",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Luma cuttings root after 21 days, while Sora cuttings root after 14 days.",
+            "raw_answer": "Luma cuttings root after 21 days, while Sora cuttings root after 14 days.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": 6.630795478820801,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": 6.630795478820801,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 81,
+            "timings": {
+              "retrieval_ms": 16.879833,
+              "context_ms": 0.4765,
+              "generation_ms": 1703.213,
+              "grounding_ms": 0.326875,
+              "total_ms": 1721.987
+            },
+            "input_tokens": 200,
+            "output_tokens": 24
+          }
+        },
+        {
+          "scenario": "nursery",
+          "query_id": "nursery-3",
+          "category": "cross_language",
+          "question": "Luma çelikleri kaç günde bir sulanmalı?",
+          "answerable": true,
+          "passed_lexical_regression": false,
+          "missing_terms": [
+            "3"
+          ],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Luma çelikleri kaç günde bir sulanmalı?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "18",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": -10.680803298950195,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": [
+                "quantity_question_not_supported"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 81,
+            "timings": {
+              "retrieval_ms": 20.643292,
+              "context_ms": 0.498917,
+              "generation_ms": 393.362,
+              "grounding_ms": 0.261625,
+              "total_ms": 415.921458
+            },
+            "input_tokens": 201,
+            "output_tokens": 3
+          }
+        },
+        {
+          "scenario": "nursery",
+          "query_id": "nursery-4",
+          "category": "missing",
+          "question": "What is the warranty period for Luma cuttings?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What is the warranty period for Luma cuttings?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "21 days",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d",
+                "document_id": "975dba52-61e3-535d-9673-ea8e716fb59b",
+                "source": "Propagation notes.md",
+                "title": "Propagation notes — Propagation notes",
+                "snippet": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.",
+                "supporting_chunk_ids": [
+                  "73d14f9e-aa0f-5b89-99f5-30a2d86b9c5d"
+                ],
+                "retrieval_score": 1.8539345264434814,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": [
+                "quantity_question_not_supported"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 81,
+            "timings": {
+              "retrieval_ms": 15.368958,
+              "context_ms": 0.451375,
+              "generation_ms": 466.125,
+              "grounding_ms": 0.266167,
+              "total_ms": 483.089709
+            },
+            "input_tokens": 198,
+            "output_tokens": 4
+          }
+        },
+        {
+          "scenario": "storage",
+          "query_id": "storage-1",
+          "category": "attribute",
+          "question": "How many days are audit events retained?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "How many days are audit events retained?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 45 days",
+            "raw_answer": "45 days",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": 8.784407615661621,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": 8.784407615661621,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 90,
+            "timings": {
+              "retrieval_ms": 18.434125,
+              "context_ms": 0.526834,
+              "generation_ms": 430.934,
+              "grounding_ms": 0.308709,
+              "total_ms": 451.189875
+            },
+            "input_tokens": 204,
+            "output_tokens": 4
+          }
+        },
+        {
+          "scenario": "storage",
+          "query_id": "storage-2",
+          "category": "procedure",
+          "question": "What steps are required for recovery?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What steps are required for recovery?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 1.\n[S1] Pause writes.\n[S1] 2.\n[S1] Select the snapshot.\n[S1] 3.\n[S1] Restore the object.\n[S1] 4.\n[S1] Verify the checksum.\n[S1] 5.\n[S1] Resume writes.",
+            "raw_answer": "1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": -5.589392185211182,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": -5.589392185211182,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 90,
+            "timings": {
+              "retrieval_ms": 16.857958,
+              "context_ms": 0.508416,
+              "generation_ms": 2093.636,
+              "grounding_ms": 1.015667,
+              "total_ms": 2113.010209
+            },
+            "input_tokens": 203,
+            "output_tokens": 29
+          }
+        },
+        {
+          "scenario": "storage",
+          "query_id": "storage-3",
+          "category": "paraphrase",
+          "question": "Which HTTP status indicates that an object does not exist?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Which HTTP status indicates that an object does not exist?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] HTTP 404",
+            "raw_answer": "HTTP 404",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": -4.824450492858887,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": -4.824450492858887,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 90,
+            "timings": {
+              "retrieval_ms": 16.820625,
+              "context_ms": 0.509875,
+              "generation_ms": 559.023,
+              "grounding_ms": 0.303875,
+              "total_ms": 577.6025
+            },
+            "input_tokens": 207,
+            "output_tokens": 6
+          }
+        },
+        {
+          "scenario": "storage",
+          "query_id": "storage-4",
+          "category": "missing",
+          "question": "Which region hosts the storage servers?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Which region hosts the storage servers?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "The storage servers are hosted in the United States (US).",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "2ab755ab-c023-5fb4-a0de-1dce6d27b240",
+                "document_id": "fb095285-1507-59cd-85c6-aabf9624c20b",
+                "source": "Object storage.md",
+                "title": "Object storage — Object storage operations",
+                "snippet": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP…",
+                "supporting_chunk_ids": [
+                  "2ab755ab-c023-5fb4-a0de-1dce6d27b240"
+                ],
+                "retrieval_score": -11.169143676757812,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [],
+              "unknown_source_ids": [],
+              "uncited_claims": [
+                "The storage servers are hosted in the United States (US)."
+              ],
+              "unsupported_claims": [],
+              "issues": [
+                "answer_has_no_citations",
+                "answer_has_uncited_claims"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 90,
+            "timings": {
+              "retrieval_ms": 16.778125,
+              "context_ms": 0.525583,
+              "generation_ms": 1267.675,
+              "grounding_ms": 13.6155,
+              "total_ms": 1299.551208
+            },
+            "input_tokens": 203,
+            "output_tokens": 13
+          }
+        },
+        {
+          "scenario": "conference",
+          "query_id": "conference-1",
+          "category": "identity",
+          "question": "Who coordinates the acoustics workshop?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Who coordinates the acoustics workshop?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Ivo Marin",
+            "raw_answer": "Ivo Marin",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": 7.622474670410156,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": 7.622474670410156,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 87,
+            "timings": {
+              "retrieval_ms": 27.592833,
+              "context_ms": 0.718708,
+              "generation_ms": 486.517,
+              "grounding_ms": 0.32,
+              "total_ms": 516.389583
+            },
+            "input_tokens": 201,
+            "output_tokens": 4
+          }
+        },
+        {
+          "scenario": "conference",
+          "query_id": "conference-2",
+          "category": "multi_attribute",
+          "question": "Where and when does the robotics workshop start?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Where and when does the robotics workshop start?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Room Cedar, 09:40",
+            "raw_answer": "Room Cedar, 09:40",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": 7.6823225021362305,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": 7.6823225021362305,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 87,
+            "timings": {
+              "retrieval_ms": 14.573625,
+              "context_ms": 0.502666,
+              "generation_ms": 830.541,
+              "grounding_ms": 0.294375,
+              "total_ms": 846.874708
+            },
+            "input_tokens": 202,
+            "output_tokens": 10
+          }
+        },
+        {
+          "scenario": "conference",
+          "query_id": "conference-3",
+          "category": "condition",
+          "question": "Can a 10-year-old attend without an adult?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Can a 10-year-old attend without an adult?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Children under 12 must attend with an adult.",
+            "raw_answer": "Yes, a 10-year-old can attend without an adult.",
+            "fallback_used": true,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": -5.305027008056641,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": -5.305027008056641,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 87,
+            "timings": {
+              "retrieval_ms": 15.4575,
+              "context_ms": 0.512917,
+              "generation_ms": 1143.349,
+              "grounding_ms": 7.979458,
+              "total_ms": 1168.214125
+            },
+            "input_tokens": 205,
+            "output_tokens": 15
+          }
+        },
+        {
+          "scenario": "conference",
+          "query_id": "conference-4",
+          "category": "missing",
+          "question": "What is Nora Demir's mobile phone number?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What is Nora Demir's mobile phone number?",
+            "cache_hit": false,
+            "status": "abstained",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "I don't have enough information in the provided sources to answer that question.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f3b7f8f9-9576-530d-8d5f-6c723440aa5c",
+                "document_id": "fb8c3f6b-79ea-5a73-bab7-14a5a2ce0121",
+                "source": "Conference programme.md",
+                "title": "Conference programme — Conference programme",
+                "snippet": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend wit…",
+                "supporting_chunk_ids": [
+                  "f3b7f8f9-9576-530d-8d5f-6c723440aa5c"
+                ],
+                "retrieval_score": -5.604770660400391,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "not_in_sources",
+            "validation": {
+              "valid": true,
+              "abstained": true,
+              "cited_source_ids": [],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 87,
+            "timings": {
+              "retrieval_ms": 15.215416,
+              "context_ms": 0.496958,
+              "generation_ms": 1277.643,
+              "grounding_ms": 10.326833,
+              "total_ms": 1304.619875
+            },
+            "input_tokens": 203,
+            "output_tokens": 16
+          }
+        },
+        {
+          "scenario": "brewery",
+          "query_id": "brewery-1",
+          "category": "attribute",
+          "question": "How long did batch B22 ferment?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "How long did batch B22 ferment?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 12 days",
+            "raw_answer": "12 days",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": 8.083112716674805,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": 8.083112716674805,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 93,
+            "timings": {
+              "retrieval_ms": 20.215,
+              "context_ms": 0.536417,
+              "generation_ms": 563.931,
+              "grounding_ms": 0.295459,
+              "total_ms": 586.186917
+            },
+            "input_tokens": 208,
+            "output_tokens": 4
+          }
+        },
+        {
+          "scenario": "brewery",
+          "query_id": "brewery-2",
+          "category": "temporal",
+          "question": "What must be done before transferring a batch?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What must be done before transferring a batch?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Sanitize the receiving vessel before transfer.",
+            "raw_answer": "Sanitize the receiving vessel before transfer.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": -0.9963401556015015,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": -0.9963401556015015,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 93,
+            "timings": {
+              "retrieval_ms": 16.266167,
+              "context_ms": 0.501083,
+              "generation_ms": 825.163,
+              "grounding_ms": 0.314792,
+              "total_ms": 843.126792
+            },
+            "input_tokens": 208,
+            "output_tokens": 9
+          }
+        },
+        {
+          "scenario": "brewery",
+          "query_id": "brewery-3",
+          "category": "cross_language",
+          "question": "A17 partisi hangi sıcaklıkta fermente edildi?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "A17 partisi hangi sıcaklıkta fermente edildi?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] 19 degrees Celsius",
+            "raw_answer": "19 degrees Celsius",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": -7.783480644226074,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": -7.783480644226074,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 93,
+            "timings": {
+              "retrieval_ms": 19.743583,
+              "context_ms": 0.543291,
+              "generation_ms": 523.449,
+              "grounding_ms": 0.30425,
+              "total_ms": 545.001125
+            },
+            "input_tokens": 215,
+            "output_tokens": 5
+          }
+        },
+        {
+          "scenario": "brewery",
+          "query_id": "brewery-4",
+          "category": "missing",
+          "question": "What was the final density of batch B22?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What was the final density of batch B22?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "1.4 g/mL",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "f2a355d9-125d-52a7-b78a-8ad3fc7715be",
+                "document_id": "8a363815-1f4a-5e1c-b264-b75796fee9d5",
+                "source": "Fermentation log.md",
+                "title": "Fermentation log — Fermentation log",
+                "snippet": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.",
+                "supporting_chunk_ids": [
+                  "f2a355d9-125d-52a7-b78a-8ad3fc7715be"
+                ],
+                "retrieval_score": 4.81980037689209,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [],
+              "unknown_source_ids": [],
+              "uncited_claims": [
+                "1.4 g/mL"
+              ],
+              "unsupported_claims": [],
+              "issues": [
+                "answer_has_no_citations",
+                "answer_has_uncited_claims"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 93,
+            "timings": {
+              "retrieval_ms": 15.501875,
+              "context_ms": 0.492041,
+              "generation_ms": 574.445,
+              "grounding_ms": 8.412042,
+              "total_ms": 599.736042
+            },
+            "input_tokens": 210,
+            "output_tokens": 6
+          }
+        },
+        {
+          "scenario": "transport",
+          "query_id": "transport-1",
+          "category": "fact",
+          "question": "On which day does the South shuttle run?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "On which day does the South shuttle run?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Saturday",
+            "raw_answer": "Saturday",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": 6.268324851989746,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": 6.268324851989746,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 102,
+            "timings": {
+              "retrieval_ms": 22.623584,
+              "context_ms": 0.675458,
+              "generation_ms": 348.656,
+              "grounding_ms": 0.335708,
+              "total_ms": 373.271625
+            },
+            "input_tokens": 217,
+            "output_tokens": 2
+          }
+        },
+        {
+          "scenario": "transport",
+          "query_id": "transport-2",
+          "category": "numeric_lookup",
+          "question": "What is the charge for a second suitcase?",
+          "answerable": true,
+          "passed_lexical_regression": false,
+          "missing_terms": [
+            "6"
+          ],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What is the charge for a second suitcase?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "EUR 6",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": 0.7567018270492554,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": [
+                "quantity_question_not_supported"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 102,
+            "timings": {
+              "retrieval_ms": 31.549667,
+              "context_ms": 0.60625,
+              "generation_ms": 648.261,
+              "grounding_ms": 0.338959,
+              "total_ms": 681.801583
+            },
+            "input_tokens": 217,
+            "output_tokens": 4
+          }
+        },
+        {
+          "scenario": "transport",
+          "query_id": "transport-3",
+          "category": "negation",
+          "question": "Can passengers bring bicycles?",
+          "answerable": true,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": 1.0,
+          "evidence_span_recall": 1.0,
+          "cited_documents": [
+            "handbook"
+          ],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "Can passengers bring bicycles?",
+            "cache_hit": false,
+            "status": "answered",
+            "answer": "[S1] Yes, bicycles are not accepted.",
+            "raw_answer": "Yes, bicycles are not accepted.",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": -8.629087448120117,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": -8.629087448120117,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": null,
+            "validation": {
+              "valid": true,
+              "abstained": false,
+              "cited_source_ids": [
+                "S1"
+              ],
+              "unknown_source_ids": [],
+              "uncited_claims": [],
+              "unsupported_claims": [],
+              "issues": []
+            },
+            "context_source_count": 1,
+            "context_token_count": 102,
+            "timings": {
+              "retrieval_ms": 15.94675,
+              "context_ms": 0.530958,
+              "generation_ms": 688.584,
+              "grounding_ms": 0.315667,
+              "total_ms": 706.283875
+            },
+            "input_tokens": 213,
+            "output_tokens": 8
+          }
+        },
+        {
+          "scenario": "transport",
+          "query_id": "transport-4",
+          "category": "missing",
+          "question": "What is the fare from Harbor to Orchard?",
+          "answerable": false,
+          "passed_lexical_regression": true,
+          "missing_terms": [],
+          "forbidden_terms_found": [],
+          "retrieval_recall": null,
+          "evidence_span_recall": null,
+          "cited_documents": [],
+          "retrieved_documents": [
+            "handbook"
+          ],
+          "result": {
+            "question": "What is the fare from Harbor to Orchard?",
+            "cache_hit": false,
+            "status": "rejected",
+            "answer": "I don't have enough information in the provided sources to answer that question.",
+            "raw_answer": "EUR 4",
+            "fallback_used": false,
+            "calculation": null,
+            "extraction": null,
+            "citations": [],
+            "retrieved_sources": [
+              {
+                "citation_id": "S1",
+                "chunk_id": "c17c4eda-264a-57d8-97ac-6e2fa2cc9413",
+                "document_id": "a1c4c0d0-1f67-54c9-a395-c20355f5c646",
+                "source": "Shuttle timetable.md",
+                "title": "Shuttle timetable — Shuttle timetable",
+                "snippet": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6.…",
+                "supporting_chunk_ids": [
+                  "c17c4eda-264a-57d8-97ac-6e2fa2cc9413"
+                ],
+                "retrieval_score": 1.7031441926956177,
+                "document_version": 1,
+                "source_unit": 1,
+                "source_kind": "section"
+              }
+            ],
+            "outcome_reason": "verification_failed",
+            "validation": {
+              "valid": false,
+              "abstained": false,
+              "cited_source_ids": [],
+              "unknown_source_ids": [],
+              "uncited_claims": [
+                "EUR 4"
+              ],
+              "unsupported_claims": [],
+              "issues": [
+                "answer_has_no_citations",
+                "answer_has_uncited_claims",
+                "quantity_question_not_supported"
+              ]
+            },
+            "context_source_count": 1,
+            "context_token_count": 102,
+            "timings": {
+              "retrieval_ms": 17.885959,
+              "context_ms": 0.5465,
+              "generation_ms": 438.779,
+              "grounding_ms": 0.179792,
+              "total_ms": 458.279958
+            },
+            "input_tokens": 217,
+            "output_tokens": 4
+          }
+        }
+      ]
+    }
+  }
+}

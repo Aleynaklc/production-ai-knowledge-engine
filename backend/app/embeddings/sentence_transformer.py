@@ -4,6 +4,7 @@ from typing import cast
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
+from transformers import PreTrainedTokenizerBase
 
 from backend.app.llm.model import DeviceRequest, resolve_device
 
@@ -51,6 +52,16 @@ class SentenceTransformerEmbedder:
                 for parameter in self._model.parameters()
             ),
         }
+
+    @property
+    def tokenizer(self) -> PreTrainedTokenizerBase:
+        return cast(PreTrainedTokenizerBase, self._model.tokenizer)
+
+    @property
+    def max_content_tokens(self) -> int:
+        return int(self._model.max_seq_length) - self.tokenizer.num_special_tokens_to_add(
+            pair=False
+        )
 
     @property
     def dimension(self) -> int:

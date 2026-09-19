@@ -17,6 +17,26 @@ from backend.app.ingestion.models import DocumentChunk
 from backend.app.workspaces.parsing import SourceUnit
 
 
+def ingestion_profile(settings: Settings) -> str:
+    """Invalidate derived chunks when parsing, tokenization, or chunking changes."""
+    values = settings.model_dump(
+        include={
+            "chunk_strategy",
+            "chunk_size_tokens",
+            "chunk_overlap_tokens",
+            "model_name",
+            "model_revision",
+            "embedding_model_name",
+            "embedding_model_revision",
+            "upload_ocr_enabled",
+            "upload_ocr_languages",
+        }
+    )
+    return hashlib.sha256(
+        ("layout-structure-v2:" + json.dumps(values, sort_keys=True)).encode()
+    ).hexdigest()
+
+
 class WorkspaceDocument(BaseModel):
     id: str
     filename: str
@@ -167,6 +187,31 @@ class WorkspaceStore:
         with self.connect() as db:
             db.execute("UPDATE jobs SET state='queued' WHERE state='running'")
             db.commit()
+
+    def schedule_reindex(self) -> int:
+        """Queue versioned replacements, retaining the old ready evidence until publication."""
+        profile = ingestion_profile(self.settings)
+        with self.connect() as db:
+            rows = db.execute(
+                """SELECT d.id,v.filename,v.data,v.chunks FROM documents d
+                JOIN versions v ON v.document_id=d.id AND v.version=d.active_version
+                WHERE d.deleted=0 AND d.status='ready' AND d.version < ?""",
+                (self.settings.upload_max_versions,),
+            ).fetchall()
+        queued = 0
+        for row in rows:
+            chunks = json.loads(row["chunks"])
+            if chunks and all(
+                chunk.get("metadata", {}).get("ingestion_profile") == profile for chunk in chunks
+            ):
+                continue
+            try:
+                self.enqueue(row["filename"], row["data"], row["id"])
+                queued += 1
+            except DocumentUploadError as error:
+                if error.code != "document_busy":
+                    raise
+        return queued
 
     def next_job(self) -> tuple[int, str, int, str, bytes] | None:
         with self.connect() as db:

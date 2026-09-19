@@ -62,6 +62,7 @@ class MembershipRequest(BaseModel):
 class QuestionRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2_000)
     top_k: int | None = Field(default=None, ge=1, le=20)
+    document_ids: list[str] = Field(default_factory=list, max_length=20)
 
     @field_validator("question")
     @classmethod
@@ -258,10 +259,12 @@ def create_app(
             "service": settings.app_name,
             "environment": settings.environment,
             "api_version": "1.1.0",
-            "inference": "local",
-            "model": settings.model_name,
+            "inference": settings.effective_generation_provider,
+            "model": settings.generation_model,
+            "provider_selection": settings.generation_provider,
             "retrieval": "Qdrant + BM25 + RRF + reranking",
             "api_key_required": False,
+            "server_api_key_configured": settings.openai_api_key is not None,
             "authentication_required": True,
             "workspace_id": workspace_id,
             "role": role,
@@ -365,7 +368,9 @@ def create_app(
         _, workspace_id, _ = workspace(request)
         try:
             engine = manager.engine(workspace_id)
-            answer = engine.answer(payload.question, payload.top_k)
+            answer = engine.answer(
+                payload.question, payload.top_k, document_ids=payload.document_ids
+            )
         except DocumentUploadError:
             raise
         except Exception as exc:

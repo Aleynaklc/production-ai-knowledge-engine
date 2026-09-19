@@ -80,6 +80,9 @@ npm run dev
 ```
 
 Open <http://localhost:3000>. The local API and frontend do not require an external AI API key.
+If the backend has a nonempty `OPENAI_API_KEY`, generated workspace answers automatically
+use OpenAI instead. Without a key, generation stays local. See
+[generation provider setup](docs/generation-providers.md) for configuration and data flow.
 
 ### Workspaces and documents
 
@@ -91,7 +94,7 @@ Upload PDF, DOCX, Markdown, or UTF-8 text files. Uploads return immediately afte
 admission and progress through **Processing → Ready / Failed** in the document panel.
 You can keep asking questions about ready documents while background processing runs.
 PDF citations open the relevant page's extracted text; DOCX citations open a section.
-Original source files can be downloaded. Image-only PDFs require OCR before uploading.
+Original source files can be downloaded. Image-only PDF pages use bounded local OCR when Poppler and Tesseract are installed; see [document processing](docs/workspaces.md).
 
 Use **Replace** to upload a new version, **Retry** after a processing failure, or **Delete**
 to remove a document and its versions. Failed replacements keep the previous ready version.
@@ -107,6 +110,11 @@ permissions, cookie deployment requirements, background-job recovery, and legacy
 Use `localhost` for both local services; the default API URL is `http://localhost:8000`.
 
 ## Quality checks
+
+Real-model correctness is evaluated separately from code tests. See
+[cross-domain workspace quality](docs/workspace-quality.md) for the 40-scenario dataset,
+reproducible runner, failure reports, and explicit quality gate. The current small local
+model does not satisfy that gate; passing the tests below does not establish general answer accuracy.
 
 ```bash
 uv run ruff format --check .
@@ -288,6 +296,10 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_LOG_LEVEL` | `INFO` | Application log severity |
 | `PAKE_MODEL_NAME` | `Qwen/Qwen2.5-0.5B-Instruct` | Hugging Face model repository |
 | `PAKE_MODEL_REVISION` | pinned commit | Immutable model revision |
+| `PAKE_GENERATION_PROVIDER` | `auto` | Use OpenAI when a key exists, otherwise local; accepts `local` or `openai` overrides |
+| `OPENAI_API_KEY` | Unset | Backend-only OpenAI credential; also accepts `PAKE_OPENAI_API_KEY` |
+| `PAKE_OPENAI_MODEL` | `gpt-4.1-mini` | Model used for API generation |
+| `PAKE_OPENAI_TIMEOUT_SECONDS` | `30` | API connection/read/write timeout |
 | `PAKE_DEVICE` | `auto` | `auto`, `cpu`, `mps`, or `cuda` |
 | `PAKE_MAX_NEW_TOKENS` | `128` | Default generation limit |
 | `PAKE_CHUNK_STRATEGY` | `recursive` | Uploaded-document chunking strategy: `fixed` or `recursive` |
@@ -297,13 +309,13 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_RERANKER_MODEL_NAME` | `cross-encoder/ms-marco-MiniLM-L6-v2` | Candidate reranker |
 | `PAKE_RETRIEVAL_DEVICE` | `auto` | Retrieval model accelerator |
 | `PAKE_RETRIEVAL_TOP_K` | `5` | Final retrieval depth |
-| `PAKE_RETRIEVAL_CANDIDATE_K` | `20` | Hybrid/reranker candidate depth |
+| `PAKE_RETRIEVAL_CANDIDATE_K` | `60` | Hybrid/reranker candidate depth |
 | `PAKE_RAG_TOP_K` | `5` | Retrieved passages sent to context assembly |
-| `PAKE_RAG_MAX_SOURCES` | `3` | Maximum source blocks in one answer |
-| `PAKE_RAG_CONTEXT_TOKENS` | `650` | Source context token budget |
-| `PAKE_RAG_MAX_NEW_TOKENS` | `80` | Grounded answer generation limit |
+| `PAKE_RAG_MAX_SOURCES` | `20` | Maximum source blocks in one answer |
+| `PAKE_RAG_CONTEXT_TOKENS` | `1600` | Source context token budget |
+| `PAKE_RAG_MAX_NEW_TOKENS` | `320` | Grounded answer generation limit |
 | `PAKE_RAG_STRICT_GROUNDING` | `true` | Suppress answers that fail citation validation |
-| `PAKE_RAG_MIN_RETRIEVAL_SCORE` | `0.8` | Cross-encoder confidence floor for generation |
+| `PAKE_RAG_MIN_RETRIEVAL_SCORE` | Unset | Optional corpus-calibrated ranking cutoff; raw logits are not answerability probabilities |
 | `PAKE_RAG_EXTRACTIVE_FALLBACK_SCORE` | `1.0` | Minimum score for cited extractive fallback |
 | `PAKE_RAG_PRELOAD_ON_STARTUP` | `true` | Prepare models and index before accepting requests |
 | `PAKE_RAG_CACHE_MAX_ENTRIES` | `256` | In-process LRU answer capacity; `0` disables caching |
@@ -315,6 +327,8 @@ Git; only placeholder values belong in `.env.example`.
 | `PAKE_AUTH_SESSION_SECONDS` | `28800` | Session lifetime |
 | `PAKE_AUTH_ALLOW_REGISTRATION` | `true` | Allow account creation from the console |
 | `PAKE_UPLOAD_MAX_EXPANDED_BYTES` | `20971520` | Expanded/extracted document limit |
+| `PAKE_UPLOAD_OCR_ENABLED` | `true` | Local OCR for image-only PDF pages; requires Poppler/Tesseract |
+| `PAKE_UPLOAD_OCR_LANGUAGES` | `eng` | Installed Tesseract languages, e.g. `eng+tur` |
 | `PAKE_UPLOAD_MAX_PAGES` | `500` | Maximum PDF pages |
 | `PAKE_UPLOAD_MAX_VERSIONS` | `10` | Maximum versions per document |
 | `PAKE_UPLOAD_MAX_BYTES` | `5242880` | Maximum bytes per uploaded file |

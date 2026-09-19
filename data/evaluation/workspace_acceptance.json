@@ -1,0 +1,437 @@
+{
+  "schema_version": 1,
+  "description": "Acceptance set frozen before the generalization iteration. Synthetic new domains, documents and questions; not an externally independent benchmark. Do not tune runtime rules on individual failures. Read summaries only until the candidate configuration is frozen.",
+  "scenarios": [
+    {
+      "id": "archive",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Archive handbook.md",
+          "text": "# Archive visitor handbook\n\n## Reading room\nThe reading room closes at 17:30 on weekdays. On Saturday it closes at 14:00. It is closed on Sunday.\n\n## Copies\nPhotography without flash is permitted. Flash photography is prohibited.\n\n## Reservations\nResearchers must reserve a desk 48 hours before a visit.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "archive-1",
+          "category": "conditional",
+          "question": "What time does the reading room close on Saturday?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "14:00"
+          ],
+          "required_evidence_spans": [
+            "On Saturday it closes at 14:00."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "archive-2",
+          "category": "paraphrase",
+          "question": "How far in advance must researchers reserve a desk?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "48"
+          ],
+          "required_evidence_spans": [
+            "Researchers must reserve a desk 48 hours before a visit."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "archive-3",
+          "category": "negation",
+          "question": "Is flash photography permitted?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "prohibited"
+          ],
+          "required_evidence_spans": [
+            "Flash photography is prohibited."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "archive-4",
+          "category": "missing",
+          "question": "How much does a replacement reader card cost?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    },
+    {
+      "id": "nursery",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Propagation notes.md",
+          "text": "# Propagation notes\n\n## Luma cuttings\nKeep Luma cuttings at 18 degrees Celsius. Roots usually appear after 21 days. Water every 3 days.\n\n## Sora cuttings\nKeep Sora cuttings at 24 degrees Celsius. Roots usually appear after 14 days. Water every 2 days.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "nursery-1",
+          "category": "attribute",
+          "question": "At what temperature should Luma cuttings be kept?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "18"
+          ],
+          "required_evidence_spans": [
+            "Keep Luma cuttings at 18 degrees Celsius."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "nursery-2",
+          "category": "comparison",
+          "question": "Compare the rooting times of Luma and Sora cuttings.",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "21",
+            "14"
+          ],
+          "required_evidence_spans": [
+            "Roots usually appear after 21 days.",
+            "Roots usually appear after 14 days."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "nursery-3",
+          "category": "cross_language",
+          "question": "Luma çelikleri kaç günde bir sulanmalı?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "3"
+          ],
+          "required_evidence_spans": [
+            "Water every 3 days."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "nursery-4",
+          "category": "missing",
+          "question": "What is the warranty period for Luma cuttings?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Object storage.md",
+          "text": "# Object storage operations\n\n## Retention\nObject snapshots are retained for 16 days. Audit events are retained for 45 days.\n\n## Recovery\n1. Pause writes.\n2. Select the snapshot.\n3. Restore the object.\n4. Verify the checksum.\n5. Resume writes.\n\n## Download\nDownloads use GET /objects/{key}. A missing object returns HTTP 404.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "storage-1",
+          "category": "attribute",
+          "question": "How many days are audit events retained?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "45"
+          ],
+          "required_evidence_spans": [
+            "Audit events are retained for 45 days."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "storage-2",
+          "category": "procedure",
+          "question": "What steps are required for recovery?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "Pause",
+            "snapshot",
+            "Restore",
+            "checksum",
+            "Resume"
+          ],
+          "required_evidence_spans": [
+            "1. Pause writes.",
+            "2. Select the snapshot.",
+            "3. Restore the object.",
+            "4. Verify the checksum.",
+            "5. Resume writes."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "storage-3",
+          "category": "paraphrase",
+          "question": "Which HTTP status indicates that an object does not exist?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "404"
+          ],
+          "required_evidence_spans": [
+            "A missing object returns HTTP 404."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "storage-4",
+          "category": "missing",
+          "question": "Which region hosts the storage servers?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    },
+    {
+      "id": "conference",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Conference programme.md",
+          "text": "# Conference programme\n\n## Main hall\nThe robotics workshop starts at 09:40 in Room Cedar. The acoustics workshop starts at 11:20 in Room Willow.\n\n## Organizers\nNora Demir coordinates robotics. Ivo Marin coordinates acoustics.\n\n## Attendance\nBoth workshops require advance registration. Children under 12 must attend with an adult.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "conference-1",
+          "category": "identity",
+          "question": "Who coordinates the acoustics workshop?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "Ivo Marin"
+          ],
+          "required_evidence_spans": [
+            "Ivo Marin coordinates acoustics."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "conference-2",
+          "category": "multi_attribute",
+          "question": "Where and when does the robotics workshop start?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "09:40",
+            "Cedar"
+          ],
+          "required_evidence_spans": [
+            "The robotics workshop starts at 09:40 in Room Cedar."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "conference-3",
+          "category": "condition",
+          "question": "Can a 10-year-old attend without an adult?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "adult"
+          ],
+          "required_evidence_spans": [
+            "Children under 12 must attend with an adult."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "conference-4",
+          "category": "missing",
+          "question": "What is Nora Demir's mobile phone number?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    },
+    {
+      "id": "brewery",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Fermentation log.md",
+          "text": "# Fermentation log\n\n## Batch A17\nYeast was added on June 3. The batch fermented for 9 days at 19 degrees Celsius.\n\n## Batch B22\nYeast was added on June 7. The batch fermented for 12 days at 16 degrees Celsius.\n\n## Transfer checklist\nSanitize the receiving vessel before transfer. Record the final density after transfer.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "brewery-1",
+          "category": "attribute",
+          "question": "How long did batch B22 ferment?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "12"
+          ],
+          "required_evidence_spans": [
+            "The batch fermented for 12 days at 16 degrees Celsius."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "brewery-2",
+          "category": "temporal",
+          "question": "What must be done before transferring a batch?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "Sanitize"
+          ],
+          "required_evidence_spans": [
+            "Sanitize the receiving vessel before transfer."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "brewery-3",
+          "category": "cross_language",
+          "question": "A17 partisi hangi sıcaklıkta fermente edildi?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "19"
+          ],
+          "required_evidence_spans": [
+            "The batch fermented for 9 days at 19 degrees Celsius."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "brewery-4",
+          "category": "missing",
+          "question": "What was the final density of batch B22?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "documents": [
+        {
+          "id": "handbook",
+          "filename": "Shuttle timetable.md",
+          "text": "# Shuttle timetable\n\n## North route\nThe North shuttle leaves Harbor at 08:15 and reaches Orchard at 08:55. It runs Monday through Friday.\n\n## South route\nThe South shuttle leaves Harbor at 09:10 and reaches Quarry at 10:00. It runs on Saturday only.\n\n## Baggage\nOne suitcase is included. A second suitcase costs EUR 6. Bicycles are not accepted.\n"
+        }
+      ],
+      "queries": [
+        {
+          "id": "transport-1",
+          "category": "fact",
+          "question": "On which day does the South shuttle run?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "Saturday"
+          ],
+          "required_evidence_spans": [
+            "It runs on Saturday only."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "transport-2",
+          "category": "numeric_lookup",
+          "question": "What is the charge for a second suitcase?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "6"
+          ],
+          "required_evidence_spans": [
+            "A second suitcase costs EUR 6."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "transport-3",
+          "category": "negation",
+          "question": "Can passengers bring bicycles?",
+          "answerable": true,
+          "relevant_document_ids": [
+            "handbook"
+          ],
+          "required_answer_terms": [
+            "not"
+          ],
+          "required_evidence_spans": [
+            "Bicycles are not accepted."
+          ],
+          "forbidden_answer_terms": []
+        },
+        {
+          "id": "transport-4",
+          "category": "missing",
+          "question": "What is the fare from Harbor to Orchard?",
+          "answerable": false,
+          "relevant_document_ids": [],
+          "required_answer_terms": [],
+          "required_evidence_spans": [],
+          "forbidden_answer_terms": []
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "fastapi>=0.116,<1.0",
+    "httpx>=0.28,<1.0",
     "numpy>=2.0,<3.0",
     "pydantic-settings>=2.10,<3.0",
     "pypdf>=6.0,<7",
@@ -20,7 +21,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "httpx>=0.28,<1.0",
     "ipykernel>=6.30,<8.0",
     "ipywidgets>=8.1,<9.0",
     "mypy>=1.17,<2.0",

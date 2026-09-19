@@ -13,15 +13,17 @@ import {
   retryDocument,
   uploadDocument,
 } from '@/lib/api';
-import type { DocumentLibraryResponse } from '@/lib/api';
+import type { DocumentLibraryResponse, UploadedDocument } from '@/lib/api';
 
 export function DocumentLibrary({
   onUploaded,
   onBusyChange,
+  onDocumentsChange,
 }: {
   onUploaded: () => void;
   onBusyChange: (busy: boolean) => void;
   answering: boolean;
+  onDocumentsChange?: (documents: UploadedDocument[]) => void;
 }) {
   const [library, setLibrary] = useState<DocumentLibraryResponse | null>(null);
   const [error, setError] = useState('');
@@ -33,9 +35,11 @@ export function DocumentLibrary({
   const [source, setSource] = useState<SourceLocation | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const onChange = useRef(onUploaded);
+  const onDocuments = useRef(onDocumentsChange);
   useEffect(() => {
     onChange.current = onUploaded;
-  }, [onUploaded]);
+    onDocuments.current = onDocumentsChange;
+  }, [onUploaded, onDocumentsChange]);
   useEffect(() => {
     let active = true;
     let timer: ReturnType<typeof setTimeout>;
@@ -52,6 +56,7 @@ export function DocumentLibrary({
           onChange.current();
         lastRevision = revision;
         setLibrary(result);
+        onDocuments.current?.(result.documents);
       } catch (caught) {
         if (active) setError((caught as Error).message);
       }
